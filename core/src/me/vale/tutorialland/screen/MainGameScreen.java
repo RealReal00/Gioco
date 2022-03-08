@@ -4,15 +4,28 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.SpaceGame;
 
-public class MainGameScreen implements Screen {
+public class  MainGameScreen implements Screen {
 
-    public static final float SPEED = 120;
+    public static final float SPEED = 240;
+    public static final float SHIP_ANIMATION_SPEED = 0.5f;
+    public static final int SHIP_WIDTH_PIXEL = 17;
+    public static final int SHIP_HEIGHT_PIXEL = 32;
 
-    Texture img;
-    float x,y;
+    //sono le misure dell'immagine che andremo a disegnare
+    public static final int SHIP_WIDTH = SHIP_WIDTH_PIXEL * 3;
+    public static final int SHIP_HEIGHT = SHIP_HEIGHT_PIXEL * 3;
+
+    Animation[] rolls;
+
+    float x;
+    float y;
+    int roll;
+    float stateTime;
 
     SpaceGame game;
 
@@ -24,12 +37,30 @@ public class MainGameScreen implements Screen {
     */
 
     public MainGameScreen (SpaceGame game){
+
         this.game = game;
+        y = 15;
+        x = SpaceGame.WIDTH / 2 - SHIP_WIDTH / 2;
+
+        roll = 2;
+        rolls = new Animation[5];
+
+        /*
+        utilizziamo un array di regioni per gestire le animazioni, altrimenti non sarebbero animazioni
+        se avessimo una sola texture.
+         */
+        TextureRegion[][] rollSpriteSheet = TextureRegion.split(new Texture("ship.png"), SHIP_WIDTH_PIXEL, SHIP_HEIGHT_PIXEL);
+
+        /* Costruttori: CTRL + SPACE per vedere i diversi costruttori. Quando creiamo un nuovo oggetto le varie cose
+        che passiamo servono per creare l'oggetto.
+         */
+
+        rolls[roll] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[0]);
     }
 
     @Override
     public void show() {
-        img = new Texture("badlogic.jpg");
+
     }
 
     @Override
@@ -41,6 +72,8 @@ public class MainGameScreen implements Screen {
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
             y -= SPEED * Gdx.graphics.getDeltaTime();
         }
+
+
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
             x += SPEED * Gdx.graphics.getDeltaTime();
         }
@@ -48,9 +81,13 @@ public class MainGameScreen implements Screen {
             x -= SPEED * Gdx.graphics.getDeltaTime();
         }
 
-        ScreenUtils.clear(1, 0, 0, 1);
+        stateTime += delta;
+
+        ScreenUtils.clear(0, 0, 0, 1);
         game.batch.begin();
-        game.batch.draw(img, x, y);
+
+        game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH,SHIP_HEIGHT);
+
         game.batch.end();
 
 
