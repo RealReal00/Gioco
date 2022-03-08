@@ -11,7 +11,7 @@ import me.vale.tutorialland.SpaceGame;
 
 public class  MainGameScreen implements Screen {
 
-    public static final float SPEED = 240;
+    public static final float SPEED = 300;
     public static final float SHIP_ANIMATION_SPEED = 0.5f;
     public static final int SHIP_WIDTH_PIXEL = 17;
     public static final int SHIP_HEIGHT_PIXEL = 32;
@@ -20,12 +20,17 @@ public class  MainGameScreen implements Screen {
     public static final int SHIP_WIDTH = SHIP_WIDTH_PIXEL * 3;
     public static final int SHIP_HEIGHT = SHIP_HEIGHT_PIXEL * 3;
 
+    public static final float ROLL_TIMER_SWITCH_TIME = 0.15f; //tempo che si impiega tra un roll e l'altro dell'animazione
+
+
     Animation[] rolls;
 
     float x;
     float y;
     int roll;
-    float stateTime;
+    float rollTimer = 0; //traccia il tempo del roll
+    float stateTime; //usiamo come stato generale per l'animazione.
+                    // La classe animazione
 
     SpaceGame game;
 
@@ -40,7 +45,7 @@ public class  MainGameScreen implements Screen {
 
         this.game = game;
         y = 15;
-        x = SpaceGame.WIDTH / 2 - SHIP_WIDTH / 2;
+        x = (float) SpaceGame.WIDTH / 2 - (float)SHIP_WIDTH / 2;
 
         roll = 2;
         rolls = new Animation[5];
@@ -55,7 +60,14 @@ public class  MainGameScreen implements Screen {
         che passiamo servono per creare l'oggetto.
          */
 
-        rolls[roll] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[0]);
+        rolls[0] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[2]);//ANIMAZIONE VERSO SINISTRA
+        rolls[1] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[1]);
+        rolls[2] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[0]);//ANIMAZIONE CENTRALE
+        rolls[3] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[3]);
+        rolls[4] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[4]);//ANIMAZIONE VERSO DESTRA
+
+
+
     }
 
     @Override
@@ -69,17 +81,46 @@ public class  MainGameScreen implements Screen {
         if(Gdx.input.isKeyPressed(Input.Keys.UP)){
             y += SPEED * Gdx.graphics.getDeltaTime();
         }
+            //bordo superiore
+             if(y + SHIP_HEIGHT + 1 > Gdx.graphics.getHeight()){
+                y = Gdx.graphics.getHeight() - SHIP_HEIGHT -1;
+             }
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
             y -= SPEED * Gdx.graphics.getDeltaTime();
         }
-
+            if(y < 0){
+                y=0;
+            }
 
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
             x += SPEED * Gdx.graphics.getDeltaTime();
         }
+            //bordo sinistro
+            if(x < 0){
+                x = 0;
+
+                //Update roll
+                /*
+                controlliamo che rollTimer sia maggiore del Roll_timer_switch_time,
+                ovvero se il tempo in cui il giocatore decide di mantenere premuto il
+                tasto destro o sinistro è maggiore nel tempo che abbiamo impostato per lo switch
+                avverà l'animazione del verso in cui ci stiamo spostando.
+                 */
+                rollTimer -= Gdx.graphics.getDeltaTime();
+                if(Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME){
+
+                }
+            }
+
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
             x -= SPEED * Gdx.graphics.getDeltaTime();
         }
+
+            //bordo destro
+            //Gdx.graphics.getWidth() <- screen width
+            if(x + SHIP_WIDTH > Gdx.graphics.getWidth()){
+                x = Gdx.graphics.getWidth() - SHIP_WIDTH;
+            }
 
         stateTime += delta;
 
