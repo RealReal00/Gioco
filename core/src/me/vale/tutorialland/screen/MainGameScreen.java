@@ -28,7 +28,7 @@ public class  MainGameScreen implements Screen {
     float x;
     float y;
     int roll;
-    float rollTimer = 0; //traccia il tempo del roll
+    float rollTimer; //traccia il tempo del roll
     float stateTime; //usiamo come stato generale per l'animazione.
                     // La classe animazione
 
@@ -45,9 +45,10 @@ public class  MainGameScreen implements Screen {
 
         this.game = game;
         y = 15;
-        x = (float) SpaceGame.WIDTH / 2 - (float)SHIP_WIDTH / 2;
+        x = SpaceGame.WIDTH / 2 - SHIP_WIDTH / 2;
 
         roll = 2;
+        rollTimer = 0;
         rolls = new Animation[5];
 
         /*
@@ -78,56 +79,75 @@ public class  MainGameScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             y += SPEED * Gdx.graphics.getDeltaTime();
-        }
+
             //bordo superiore
-             if(y + SHIP_HEIGHT + 1 > Gdx.graphics.getHeight()){
-                y = Gdx.graphics.getHeight() - SHIP_HEIGHT -1;
-             }
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
-            y -= SPEED * Gdx.graphics.getDeltaTime();
+            if (y + SHIP_HEIGHT + 1 > Gdx.graphics.getHeight()) {
+                y = Gdx.graphics.getHeight() - SHIP_HEIGHT - 1;
+            }
         }
-            if(y < 0){
-                y=0;
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            y -= SPEED * Gdx.graphics.getDeltaTime();
+
+            if (y < 0) {
+                y = 0;
+            }
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            x -= SPEED * Gdx.graphics.getDeltaTime();
+
+            //bordo sinistro
+            if (x < 0) {
+                x = 0;
             }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
-            x += SPEED * Gdx.graphics.getDeltaTime();
-        }
-            //bordo sinistro
-            if(x < 0){
-                x = 0;
-
-                //Update roll
+            //Update roll
                 /*
                 controlliamo che rollTimer sia maggiore del Roll_timer_switch_time,
                 ovvero se il tempo in cui il giocatore decide di mantenere premuto il
                 tasto destro o sinistro è maggiore nel tempo che abbiamo impostato per lo switch
                 avverà l'animazione del verso in cui ci stiamo spostando.
                  */
-                rollTimer -= Gdx.graphics.getDeltaTime();
-                if(Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME){
+            rollTimer -= Gdx.graphics.getDeltaTime();
+            if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME) {
+                rollTimer = 0;
+                roll--;
 
+                if (roll < 0) {
+                    roll = 0;
                 }
             }
-
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
-            x -= SPEED * Gdx.graphics.getDeltaTime();
         }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            x += SPEED * Gdx.graphics.getDeltaTime();
+
 
             //bordo destro
             //Gdx.graphics.getWidth() <- screen width
-            if(x + SHIP_WIDTH > Gdx.graphics.getWidth()){
+            if (x + SHIP_WIDTH > Gdx.graphics.getWidth()) {
                 x = Gdx.graphics.getWidth() - SHIP_WIDTH;
             }
 
+            //update roll
+            rollTimer += Gdx.graphics.getDeltaTime();
+            if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME) {
+                rollTimer = 0;
+                roll++;
+
+                if (roll > 4) {
+                    roll = 4;
+                }
+            }
+        }
         stateTime += delta;
 
         ScreenUtils.clear(0, 0, 0, 1);
         game.batch.begin();
 
-        game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH,SHIP_HEIGHT);
+        game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
 
         game.batch.end();
 
