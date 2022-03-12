@@ -20,7 +20,7 @@ public class  MainGameScreen implements Screen {
     public static final int SHIP_WIDTH = SHIP_WIDTH_PIXEL * 3;
     public static final int SHIP_HEIGHT = SHIP_HEIGHT_PIXEL * 3;
 
-    public static final float ROLL_TIMER_SWITCH_TIME = 0.15f; //tempo che si impiega tra un roll e l'altro dell'animazione
+    public static final float ROLL_TIMER_SWITCH_TIME = 0.25f; //tempo che si impiega tra un roll e l'altro dell'animazione
 
 
     Animation[] rolls;
@@ -103,6 +103,12 @@ public class  MainGameScreen implements Screen {
                 x = 0;
             }
 
+            //aggiorniamo la virata a sinistra se siamo ancora in virata verso destra (movimento più fluido e naturale)
+            if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.RIGHT) && roll > 0){
+                rollTimer = 0;
+                roll--;
+            }
+
             //Update roll
                 /*
                 controlliamo che rollTimer sia maggiore del Roll_timer_switch_time,
@@ -111,16 +117,31 @@ public class  MainGameScreen implements Screen {
                 avverà l'animazione del verso in cui ci stiamo spostando.
                  */
             rollTimer -= Gdx.graphics.getDeltaTime();
-            if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME) {
+            if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll > 0) {
                 rollTimer = 0;
                 roll--;
 
                 if (roll < 0) {
                     roll = 0;
                 }
-            }
-        }
 
+            }
+        }else {
+                if (roll < 2) {
+                    rollTimer += Gdx.graphics.getDeltaTime();
+                    if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll < 4) {
+                        rollTimer = 0;
+                        roll++;
+
+                        if (roll > 4) {
+                            roll = 4;
+                        }
+                    }
+                }
+            }
+
+
+// movimento verso destra
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             x += SPEED * Gdx.graphics.getDeltaTime();
 
@@ -133,7 +154,7 @@ public class  MainGameScreen implements Screen {
 
             //update roll
             rollTimer += Gdx.graphics.getDeltaTime();
-            if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME) {
+            if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll < 4) {
                 rollTimer = 0;
                 roll++;
 
@@ -141,7 +162,23 @@ public class  MainGameScreen implements Screen {
                     roll = 4;
                 }
             }
+            /*
+            se roll è < 2 stiamo ancora virando verso sinistra.
+             */
+        } else {
+            if (roll > 2) {
+                rollTimer -= Gdx.graphics.getDeltaTime();
+                if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll > 0) {
+                    rollTimer = 0;
+                    roll--;
+
+                    if (roll < 0) {
+                        roll = 0;
+                    }
+                }
+            }
         }
+
         stateTime += delta;
 
         ScreenUtils.clear(0, 0, 0, 1);
