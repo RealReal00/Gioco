@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.SpaceGame;
+import me.vale.tutorialland.entities.Bullet;
+
+import java.util.ArrayList;
 
 public class  MainGameScreen implements Screen {
 
@@ -34,6 +37,8 @@ public class  MainGameScreen implements Screen {
 
     SpaceGame game;
 
+    ArrayList<Bullet> bullets;
+
     /* Quando creiamo il costruttore di MainGameScreen, passiamo "SpaceGame Game" cosi dentro questa classe siamo in
     grado di accedere alla classe principale "SpaceGame". In questo modo accediamo al batch (dobbiamo definirlo public),
     E poi impostiamo il game di questa classe (this.game), con il game che passiamo dalla classe main.
@@ -46,6 +51,7 @@ public class  MainGameScreen implements Screen {
         this.game = game;
         y = 15;
         x = SpaceGame.WIDTH / 2 - SHIP_WIDTH / 2;
+        bullets = new ArrayList<Bullet>();
 
         roll = 2;
         rollTimer = 0;
@@ -78,6 +84,28 @@ public class  MainGameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+
+        //shooting code
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+            bullets.add(new Bullet(x + 4, y + 40 ));
+            bullets.add(new Bullet(x + SHIP_WIDTH - 4, y + 40));
+        }
+
+        //update bullets (loop dentro la lista bullets, per ogni bullet presente al suo interno).
+        ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
+
+        for(Bullet bullet : bullets) {
+            bullet.update(delta);
+            if (bullet.remove) {
+                bulletsToRemove.add(bullet); //se un bullet deve essere rimosso viene inserito nella lista delle rimozioni
+            }
+        }
+            bullets.removeAll(bulletsToRemove); //rimuoviamo tutti i proiettili da eliminare dopo ogni loop
+
+
+
+        //movement code
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             y += SPEED * Gdx.graphics.getDeltaTime();
@@ -181,9 +209,13 @@ public class  MainGameScreen implements Screen {
 
         stateTime += delta;
 
+        // il rendering funziona a layer, quindi l'ultima cosa che verrà reinderizzata sarà sopra le altre
         ScreenUtils.clear(0, 0, 0, 1);
         game.batch.begin();
 
+        for(Bullet bullet : bullets){
+            bullet.render(game.batch);
+        }
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
 
         game.batch.end();
