@@ -71,8 +71,8 @@ public class  MainGameScreen implements Screen {
         this.game = game;
         y = 15;
         x = (float) SpaceGame.WIDTH / 2 - (float) SHIP_WIDTH / 2;
-        bullets = new ArrayList<Bullet>();
-        asteroids = new ArrayList<Asteroid>();
+        bullets = new ArrayList<>();
+        asteroids = new ArrayList<>();
         scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
 
         score = 0;
@@ -100,11 +100,11 @@ public class  MainGameScreen implements Screen {
         che passiamo servono per creare l'oggetto.
          */
 
-        rolls[0] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[2]);//ANIMAZIONE VERSO SINISTRA
-        rolls[1] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[1]);
-        rolls[2] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[0]);//ANIMAZIONE CENTRALE
-        rolls[3] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[3]);
-        rolls[4] = new Animation(SHIP_ANIMATION_SPEED, rollSpriteSheet[4]);//ANIMAZIONE VERSO DESTRA
+        rolls[0] = new Animation<>(SHIP_ANIMATION_SPEED, rollSpriteSheet[2]);//ANIMAZIONE VERSO SINISTRA
+        rolls[1] = new Animation<>(SHIP_ANIMATION_SPEED, rollSpriteSheet[1]);
+        rolls[2] = new Animation<>(SHIP_ANIMATION_SPEED, rollSpriteSheet[0]);//ANIMAZIONE CENTRALE
+        rolls[3] = new Animation<>(SHIP_ANIMATION_SPEED, rollSpriteSheet[3]);
+        rolls[4] = new Animation<>(SHIP_ANIMATION_SPEED, rollSpriteSheet[4]);//ANIMAZIONE VERSO DESTRA
 
 
 
@@ -146,7 +146,7 @@ public class  MainGameScreen implements Screen {
         }
 
         //Update asteroids
-        ArrayList<Asteroid> asteroidsToRemove = new ArrayList<Asteroid>();
+        ArrayList<Asteroid> asteroidsToRemove = new ArrayList<>();
         for (Asteroid asteroid : asteroids){
             asteroid.update(delta);
             if(asteroid.remove){
@@ -156,7 +156,7 @@ public class  MainGameScreen implements Screen {
 
 
         //update bullets (loop dentro la lista bullets, per ogni bullet presente al suo interno).
-        ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
+        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         for (Bullet bullet : bullets) {
             bullet.update(delta);
             if (bullet.remove) {
@@ -286,7 +286,7 @@ public class  MainGameScreen implements Screen {
         game.batch.begin();
 
         GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "" + score);
-        scoreFont.draw(game.batch, scoreLayout, Gdx.graphics.getWidth() / 2 - scoreLayout.width / 2, Gdx.graphics.getHeight() - scoreLayout.height - 10);
+        scoreFont.draw(game.batch, scoreLayout, (float)Gdx.graphics.getWidth() / 2 - scoreLayout.width / 2, Gdx.graphics.getHeight() - scoreLayout.height - 10);
 
         for (Bullet bullet : bullets) {
             bullet.render(game.batch);
