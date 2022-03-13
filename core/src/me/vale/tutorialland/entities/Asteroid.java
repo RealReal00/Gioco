@@ -3,6 +3,7 @@ package me.vale.tutorialland.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import me.vale.tutorialland.tools.CollisionReact;
 
 public class Asteroid {
 
@@ -12,6 +13,7 @@ public class Asteroid {
     private static Texture texture;
 
     float x, y;
+    CollisionReact react;
 
     //l'oggetto è pubblico perchè possiamo rimuoverlo dalla lista che esternamente.
     public boolean remove = false;
@@ -19,6 +21,7 @@ public class Asteroid {
     public Asteroid(float x) {
         this.x = x;
         this.y = Gdx.graphics.getHeight();
+        this.react = new CollisionReact(x,y,WIDTH,HEIGHT);
 
         if (texture == null) {
             texture = new Texture("asteroid.png");
@@ -30,6 +33,7 @@ public class Asteroid {
         if (y < -HEIGHT) {
             remove = true;
         }
+        react.move(x,y);
     }
 
     public void render(SpriteBatch batch) {
@@ -37,4 +41,7 @@ public class Asteroid {
 
     }
 
+    public CollisionReact getCollisionReact() {
+        return react;
+    }
 }

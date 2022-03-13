@@ -1,5 +1,6 @@
 package me.vale.tutorialland;
 
+import me.vale.tutorialland.spacegame.SpaceGame;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 

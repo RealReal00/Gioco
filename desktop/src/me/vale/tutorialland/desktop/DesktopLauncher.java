@@ -2,8 +2,7 @@ package me.vale.tutorialland.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import me.vale.tutorialland.SpaceGame;
-import sun.jvm.hotspot.gc.shared.Space;
+import me.vale.tutorialland.spacegame.SpaceGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {

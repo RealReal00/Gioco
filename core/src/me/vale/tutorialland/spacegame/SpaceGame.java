@@ -1,4 +1,4 @@
-package me.vale.tutorialland;
+package me.vale.tutorialland.spacegame;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

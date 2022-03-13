@@ -5,9 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
-import me.vale.tutorialland.SpaceGame;
+import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.entities.Asteroid;
 import me.vale.tutorialland.entities.Bullet;
 
@@ -53,6 +55,10 @@ public class  MainGameScreen implements Screen {
 
     ArrayList<Bullet> bullets;
     ArrayList<Asteroid> asteroids;
+
+    BitmapFont scoreFont;
+    int score;
+
     /* Quando creiamo il costruttore di MainGameScreen, passiamo "SpaceGame Game" cosi dentro questa classe siamo in
     grado di accedere alla classe principale "SpaceGame". In questo modo accediamo al batch (dobbiamo definirlo public),
     E poi impostiamo il game di questa classe (this.game), con il game che passiamo dalla classe main.
@@ -67,7 +73,9 @@ public class  MainGameScreen implements Screen {
         x = (float) SpaceGame.WIDTH / 2 - (float) SHIP_WIDTH / 2;
         bullets = new ArrayList<Bullet>();
         asteroids = new ArrayList<Asteroid>();
+        scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
 
+        score = 0;
         /*
         Random.nextfloat() genera un numero random compreso tra 0 e 1
         in pratica quello che facciamo e fare un calcolo random + aggiungiamo 0.3s al risultato in modo da avere uno spawn
@@ -145,7 +153,6 @@ public class  MainGameScreen implements Screen {
                 asteroidsToRemove.add(asteroid);
             }
         }
-        asteroids.removeAll(asteroidsToRemove);
 
 
         //update bullets (loop dentro la lista bullets, per ogni bullet presente al suo interno).
@@ -156,8 +163,6 @@ public class  MainGameScreen implements Screen {
                 bulletsToRemove.add(bullet); //se un bullet deve essere rimosso viene inserito nella lista delle rimozioni
             }
         }
-        bullets.removeAll(bulletsToRemove); //rimuoviamo tutti i proiettili da eliminare dopo ogni loop
-
 
         //movement code
 
@@ -258,11 +263,30 @@ public class  MainGameScreen implements Screen {
             }
         }
 
+        /* Dopo gli update di ogni oggetto, controlliamo le collisioni
+           Eseguiamo un loop innestato, in modo che controlliamo se un proiettile ha una collisione con un
+           qualsiasi proiettile presente nello schermo di gioco.
+         */
+        for(Bullet bullet : bullets){
+            for (Asteroid asteroid : asteroids){
+                if(bullet.getCollisionReact().collidesWith(asteroid.getCollisionReact())){ //avviene una collisione
+                    bulletsToRemove.add(bullet);
+                    asteroidsToRemove.add(asteroid);
+                    score += 100;
+                }
+            }
+        }
+        asteroids.removeAll(asteroidsToRemove); //rimuoviamo tutti gli asteroidi presenti nell' ArrayList da rimuovere
+        bullets.removeAll(bulletsToRemove); //rimuoviamo tutti i proiettili presenti nell' ArrayList da rimuovere
+
         stateTime += delta;
 
         // il rendering funziona a layer, quindi l'ultima cosa che verrà reinderizzata sarà sopra le altre
         ScreenUtils.clear(0, 0, 0, 1);
         game.batch.begin();
+
+        GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "" + score);
+        scoreFont.draw(game.batch, scoreLayout, Gdx.graphics.getWidth() / 2 - scoreLayout.width / 2, Gdx.graphics.getHeight() - scoreLayout.height - 10);
 
         for (Bullet bullet : bullets) {
             bullet.render(game.batch);
@@ -271,6 +295,7 @@ public class  MainGameScreen implements Screen {
         for (Asteroid asteroid : asteroids){
             asteroid.render(game.batch);
         }
+
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
 
         game.batch.end();

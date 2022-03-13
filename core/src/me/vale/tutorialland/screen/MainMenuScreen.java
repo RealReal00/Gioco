@@ -4,8 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.ScreenUtils;
-import me.vale.tutorialland.SpaceGame;
-import sun.jvm.hotspot.gc.shared.Space;
+import me.vale.tutorialland.spacegame.SpaceGame;
 
 public class MainMenuScreen implements Screen {
 
