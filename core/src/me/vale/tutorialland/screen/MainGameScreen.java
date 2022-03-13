@@ -8,9 +8,11 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.SpaceGame;
+import me.vale.tutorialland.entities.Asteroid;
 import me.vale.tutorialland.entities.Bullet;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class  MainGameScreen implements Screen {
 
@@ -23,8 +25,16 @@ public class  MainGameScreen implements Screen {
     public static final int SHIP_WIDTH = SHIP_WIDTH_PIXEL * 3;
     public static final int SHIP_HEIGHT = SHIP_HEIGHT_PIXEL * 3;
 
+    //BULLETS
     public static final float ROLL_TIMER_SWITCH_TIME = 0.25f; //tempo che si impiega tra un roll e l'altro dell'animazione
     public static final float SHOOT_WAIT_TIME = 0.3f;
+
+    //ASTEROID
+    public static final float MIN_ASTEROID_SPAWN_TIME = 0.3f; //minimo di tempo di spawn tra un asteroide e l'altro
+    public static final float MAX_ASTEROID_SPAWN_TIME = 0.6f; //max tempo di spawn di un asteroide
+
+
+
 
     Animation[] rolls;
 
@@ -34,11 +44,15 @@ public class  MainGameScreen implements Screen {
     float rollTimer; //traccia il tempo del roll
     float stateTime; //usiamo come stato generale per l'animazione.
                     // La classe animazione
+    float asteroidsSpawnTimer;
+
+    Random random;
+
     float shootTimer;
     SpaceGame game;
 
     ArrayList<Bullet> bullets;
-
+    ArrayList<Asteroid> asteroids;
     /* Quando creiamo il costruttore di MainGameScreen, passiamo "SpaceGame Game" cosi dentro questa classe siamo in
     grado di accedere alla classe principale "SpaceGame". In questo modo accediamo al batch (dobbiamo definirlo public),
     E poi impostiamo il game di questa classe (this.game), con il game che passiamo dalla classe main.
@@ -50,8 +64,17 @@ public class  MainGameScreen implements Screen {
 
         this.game = game;
         y = 15;
-        x = SpaceGame.WIDTH / 2 - SHIP_WIDTH / 2;
+        x = (float) SpaceGame.WIDTH / 2 - (float) SHIP_WIDTH / 2;
         bullets = new ArrayList<Bullet>();
+        asteroids = new ArrayList<Asteroid>();
+
+        /*
+        Random.nextfloat() genera un numero random compreso tra 0 e 1
+        in pratica quello che facciamo e fare un calcolo random + aggiungiamo 0.3s al risultato in modo da avere uno spawn
+        randomico ogni 0.3 e 0.6 secondi.
+         */
+        random = new Random();
+        asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
 
         shootTimer = 0;
 
@@ -106,9 +129,27 @@ public class  MainGameScreen implements Screen {
             bullets.add(new Bullet(x + SHIP_WIDTH - offset, y + 40));
         }
 
+        //Asteroids Spawn Code
+        //Gdx.graphics.getWidth() - Asteroid.WIDTH <- per evitare asteroidi tagliati sul bordo destro dello schermo
+        asteroidsSpawnTimer -= delta;
+        if(asteroidsSpawnTimer <= 0){
+            asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
+            asteroids.add(new Asteroid(random.nextInt(Gdx.graphics.getWidth() - Asteroid.WIDTH)));
+        }
+
+        //Update asteroids
+        ArrayList<Asteroid> asteroidsToRemove = new ArrayList<Asteroid>();
+        for (Asteroid asteroid : asteroids){
+            asteroid.update(delta);
+            if(asteroid.remove){
+                asteroidsToRemove.add(asteroid);
+            }
+        }
+        asteroids.removeAll(asteroidsToRemove);
+
+
         //update bullets (loop dentro la lista bullets, per ogni bullet presente al suo interno).
         ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
-
         for (Bullet bullet : bullets) {
             bullet.update(delta);
             if (bullet.remove) {
@@ -225,6 +266,10 @@ public class  MainGameScreen implements Screen {
 
         for (Bullet bullet : bullets) {
             bullet.render(game.batch);
+        }
+
+        for (Asteroid asteroid : asteroids){
+            asteroid.render(game.batch);
         }
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
 
