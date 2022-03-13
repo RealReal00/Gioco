@@ -24,7 +24,7 @@ public class  MainGameScreen implements Screen {
     public static final int SHIP_HEIGHT = SHIP_HEIGHT_PIXEL * 3;
 
     public static final float ROLL_TIMER_SWITCH_TIME = 0.25f; //tempo che si impiega tra un roll e l'altro dell'animazione
-
+    public static final float SHOOT_WAIT_TIME = 0.3f;
 
     Animation[] rolls;
 
@@ -34,7 +34,7 @@ public class  MainGameScreen implements Screen {
     float rollTimer; //traccia il tempo del roll
     float stateTime; //usiamo come stato generale per l'animazione.
                     // La classe animazione
-
+    float shootTimer;
     SpaceGame game;
 
     ArrayList<Bullet> bullets;
@@ -52,6 +52,8 @@ public class  MainGameScreen implements Screen {
         y = 15;
         x = SpaceGame.WIDTH / 2 - SHIP_WIDTH / 2;
         bullets = new ArrayList<Bullet>();
+
+        shootTimer = 0;
 
         roll = 2;
         rollTimer = 0;
@@ -86,22 +88,34 @@ public class  MainGameScreen implements Screen {
     public void render(float delta) {
 
         //shooting code
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            bullets.add(new Bullet(x + 4, y + 40 ));
-            bullets.add(new Bullet(x + SHIP_WIDTH - 4, y + 40));
+        shootTimer += delta;
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && shootTimer >= SHOOT_WAIT_TIME) {
+            shootTimer = 0;
+
+            int offset = 4;
+
+            if(roll == 1 || roll == 3){ //virata leggera (sia sinistra che destra)
+                offset = 8;
+            }
+
+            if(roll == 0 || roll == 4){ //virata completa (sia sinistra che destra)
+                offset = 16;
+            }
+
+            bullets.add(new Bullet(x + offset, y + 40));
+            bullets.add(new Bullet(x + SHIP_WIDTH - offset, y + 40));
         }
 
         //update bullets (loop dentro la lista bullets, per ogni bullet presente al suo interno).
         ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
 
-        for(Bullet bullet : bullets) {
+        for (Bullet bullet : bullets) {
             bullet.update(delta);
             if (bullet.remove) {
                 bulletsToRemove.add(bullet); //se un bullet deve essere rimosso viene inserito nella lista delle rimozioni
             }
         }
-            bullets.removeAll(bulletsToRemove); //rimuoviamo tutti i proiettili da eliminare dopo ogni loop
-
+        bullets.removeAll(bulletsToRemove); //rimuoviamo tutti i proiettili da eliminare dopo ogni loop
 
 
         //movement code
@@ -123,6 +137,9 @@ public class  MainGameScreen implements Screen {
             }
         }
 
+// movimento verso sinistra
+
+
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             x -= SPEED * Gdx.graphics.getDeltaTime();
 
@@ -132,7 +149,7 @@ public class  MainGameScreen implements Screen {
             }
 
             //aggiorniamo la virata a sinistra se siamo ancora in virata verso destra (movimento più fluido e naturale)
-            if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.RIGHT) && roll > 0){
+            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.RIGHT) && roll > 0) {
                 rollTimer = 0;
                 roll--;
             }
@@ -146,27 +163,19 @@ public class  MainGameScreen implements Screen {
                  */
             rollTimer -= Gdx.graphics.getDeltaTime();
             if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll > 0) {
-                rollTimer = 0;
+                rollTimer -= ROLL_TIMER_SWITCH_TIME;
                 roll--;
-
-                if (roll < 0) {
-                    roll = 0;
-                }
-
             }
-        }else {
-                if (roll < 2) {
-                    rollTimer += Gdx.graphics.getDeltaTime();
-                    if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll < 4) {
-                        rollTimer = 0;
-                        roll++;
+        } else {
+            if (roll < 2) {
+                rollTimer += Gdx.graphics.getDeltaTime();
+                if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll < 4) {
+                    rollTimer -= ROLL_TIMER_SWITCH_TIME;
+                    roll++;
 
-                        if (roll > 4) {
-                            roll = 4;
-                        }
-                    }
                 }
             }
+        }
 
 
 // movimento verso destra
@@ -180,29 +189,30 @@ public class  MainGameScreen implements Screen {
                 x = Gdx.graphics.getWidth() - SHIP_WIDTH;
             }
 
+            //aggiorniamo la virata a sinistra se siamo ancora in virata verso destra (movimento più fluido e naturale)
+            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && !Gdx.input.isKeyPressed(Input.Keys.LEFT) && roll > 0) {
+                rollTimer = 0;
+                if(roll < 4){
+                roll++;
+                }
+            }
+
             //update roll
             rollTimer += Gdx.graphics.getDeltaTime();
             if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll < 4) {
-                rollTimer = 0;
+                rollTimer -= ROLL_TIMER_SWITCH_TIME;
                 roll++;
-
-                if (roll > 4) {
-                    roll = 4;
-                }
             }
             /*
             se roll è < 2 stiamo ancora virando verso sinistra.
              */
-        } else {
+        }
+        else {
             if (roll > 2) {
                 rollTimer -= Gdx.graphics.getDeltaTime();
                 if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll > 0) {
-                    rollTimer = 0;
+                    rollTimer -= ROLL_TIMER_SWITCH_TIME;
                     roll--;
-
-                    if (roll < 0) {
-                        roll = 0;
-                    }
                 }
             }
         }
@@ -213,7 +223,7 @@ public class  MainGameScreen implements Screen {
         ScreenUtils.clear(0, 0, 0, 1);
         game.batch.begin();
 
-        for(Bullet bullet : bullets){
+        for (Bullet bullet : bullets) {
             bullet.render(game.batch);
         }
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
