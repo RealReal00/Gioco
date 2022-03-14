@@ -21,7 +21,7 @@ public class Asteroid {
     public Asteroid(float x) {
         this.x = x;
         this.y = Gdx.graphics.getHeight();
-        this.react = new CollisionReact(x,y,WIDTH,HEIGHT);
+        this.react = new CollisionReact(x, y, WIDTH, HEIGHT);
 
         if (texture == null) {
             texture = new Texture("asteroid.png");
@@ -33,7 +33,7 @@ public class Asteroid {
         if (y < -HEIGHT) {
             remove = true;
         }
-        react.move(x,y);
+        react.move(x, y);
     }
 
     public void render(SpriteBatch batch) {
@@ -44,4 +44,14 @@ public class Asteroid {
     public CollisionReact getCollisionReact() {
         return react;
     }
+
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
 }

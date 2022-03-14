@@ -8,7 +8,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import me.vale.tutorialland.entities.Explosion;
 import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.entities.Asteroid;
 import me.vale.tutorialland.entities.Bullet;
@@ -55,6 +57,7 @@ public class  MainGameScreen implements Screen {
 
     ArrayList<Bullet> bullets;
     ArrayList<Asteroid> asteroids;
+    ArrayList<Explosion> explosions;
 
     BitmapFont scoreFont;
     int score;
@@ -73,6 +76,7 @@ public class  MainGameScreen implements Screen {
         x = (float) SpaceGame.WIDTH / 2 - (float) SHIP_WIDTH / 2;
         bullets = new ArrayList<>();
         asteroids = new ArrayList<>();
+        explosions = new ArrayList<>();
         scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
 
         score = 0;
@@ -133,8 +137,17 @@ public class  MainGameScreen implements Screen {
                 offset = 16;
             }
 
-            bullets.add(new Bullet(x + offset, y + 40));
-            bullets.add(new Bullet(x + SHIP_WIDTH - offset, y + 40));
+            bullets.add(new Bullet(x + SHIP_WIDTH - SHIP_WIDTH/2, y+ 40));
+
+            if(score > 1000){
+                bullets.add(new Bullet(x + offset, y + 40));
+                bullets.add(new Bullet(x + SHIP_WIDTH - offset, y + 40));
+            }
+
+            if(score > 2500){
+                bullets.add(new Bullet(x + offset + 10, y + 40));
+                bullets.add(new Bullet(x + SHIP_WIDTH - offset - 10, y + 40));
+            }
         }
 
         //Asteroids Spawn Code
@@ -163,6 +176,18 @@ public class  MainGameScreen implements Screen {
                 bulletsToRemove.add(bullet); //se un bullet deve essere rimosso viene inserito nella lista delle rimozioni
             }
         }
+
+        //update explosions
+        ArrayList<Explosion> explosionsToRemove = new ArrayList<>();
+        for(Explosion explosion : explosions){
+            explosion.update(delta);
+            if(explosion.remove){
+                explosionsToRemove.add(explosion);
+            }
+        }
+        explosions.removeAll(explosionsToRemove);
+
+
 
         //movement code
 
@@ -272,6 +297,7 @@ public class  MainGameScreen implements Screen {
                 if(bullet.getCollisionReact().collidesWith(asteroid.getCollisionReact())){ //avviene una collisione
                     bulletsToRemove.add(bullet);
                     asteroidsToRemove.add(asteroid);
+                    explosions.add(new Explosion(asteroid.getX(),asteroid.getY()));
                     score += 100;
                 }
             }
@@ -285,10 +311,7 @@ public class  MainGameScreen implements Screen {
         ScreenUtils.clear(0, 0, 0, 1);
         game.batch.begin();
 
-        GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "" + score);
-        scoreFont.draw(game.batch, scoreLayout, (float)Gdx.graphics.getWidth() / 2 - scoreLayout.width / 2, Gdx.graphics.getHeight() - scoreLayout.height - 10);
-
-        for (Bullet bullet : bullets) {
+               for (Bullet bullet : bullets) {
             bullet.render(game.batch);
         }
 
@@ -296,7 +319,16 @@ public class  MainGameScreen implements Screen {
             asteroid.render(game.batch);
         }
 
+        for (Explosion explosion : explosions){
+        explosion.render(game.batch);
+        }
+
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
+
+
+        GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "" + score);
+        scoreFont.draw(game.batch, scoreLayout, (float)Gdx.graphics.getWidth() / 2 - scoreLayout.width / 2, Gdx.graphics.getHeight() - scoreLayout.height - 10);
+
 
         game.batch.end();
 
