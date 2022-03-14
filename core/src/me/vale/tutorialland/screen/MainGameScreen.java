@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.entities.Explosion;
 import me.vale.tutorialland.spacegame.SpaceGame;
@@ -20,7 +19,7 @@ import java.util.Random;
 
 public class  MainGameScreen implements Screen {
 
-    public static final float SPEED = 300;
+    public static final float SPEED = 400;
     public static final float SHIP_ANIMATION_SPEED = 0.5f;
     public static final int SHIP_WIDTH_PIXEL = 17;
     public static final int SHIP_HEIGHT_PIXEL = 32;
@@ -66,7 +65,7 @@ public class  MainGameScreen implements Screen {
     grado di accedere alla classe principale "SpaceGame". In questo modo accediamo al batch (dobbiamo definirlo public),
     E poi impostiamo il game di questa classe (this.game), con il game che passiamo dalla classe main.
 
-    Dobbiamo impostare il batch come game.batch, perchè il batch appartiene al game passato dalla classe main.
+    Dobbiamo impostare il batch come game.batch, perché il batch appartiene al game passato dalla classe main.
     */
 
     public MainGameScreen (SpaceGame game){
@@ -137,7 +136,7 @@ public class  MainGameScreen implements Screen {
                 offset = 16;
             }
 
-            bullets.add(new Bullet(x + SHIP_WIDTH - SHIP_WIDTH/2, y+ 40));
+            bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH/2, y+ 40));
 
             if(score > 1000){
                 bullets.add(new Bullet(x + offset, y + 40));
@@ -230,7 +229,7 @@ public class  MainGameScreen implements Screen {
                 controlliamo che rollTimer sia maggiore del Roll_timer_switch_time,
                 ovvero se il tempo in cui il giocatore decide di mantenere premuto il
                 tasto destro o sinistro è maggiore nel tempo che abbiamo impostato per lo switch
-                avverà l'animazione del verso in cui ci stiamo spostando.
+                avvera' l'animazione del verso in cui ci stiamo spostando.
                  */
             rollTimer -= Gdx.graphics.getDeltaTime();
             if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll > 0) {

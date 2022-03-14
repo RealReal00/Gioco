@@ -5,9 +5,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import me.vale.tutorialland.tools.CollisionReact;
 
+import java.util.Random;
+
 public class Asteroid {
 
-    public static final int SPEED = 250;
+    Random random = new Random();
+
+    public static final int max = 400;
+    public static final int min = 250;
+    public final int SPEED = random.nextInt(max-min)+min;
     public static final int WIDTH = 16;
     public static final int HEIGHT = 16;
     private static Texture texture;
@@ -17,6 +23,10 @@ public class Asteroid {
 
     //l'oggetto è pubblico perchè possiamo rimuoverlo dalla lista che esternamente.
     public boolean remove = false;
+
+
+
+
 
     public Asteroid(float x) {
         this.x = x;
