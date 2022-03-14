@@ -13,11 +13,16 @@ import me.vale.tutorialland.entities.Explosion;
 import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.entities.Asteroid;
 import me.vale.tutorialland.entities.Bullet;
+import me.vale.tutorialland.tools.CollisionReact;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static java.awt.Color.white;
+
 public class  MainGameScreen implements Screen {
+
 
     public static final float SPEED = 400;
     public static final float SHIP_ANIMATION_SPEED = 0.5f;
@@ -58,7 +63,13 @@ public class  MainGameScreen implements Screen {
     ArrayList<Asteroid> asteroids;
     ArrayList<Explosion> explosions;
 
+    Texture blank;
+
     BitmapFont scoreFont;
+
+    CollisionReact playerReact;
+
+    float health = 1; //0 = dead, 1 = full health
     int score;
 
     /* Quando creiamo il costruttore di MainGameScreen, passiamo "SpaceGame Game" cosi dentro questa classe siamo in
@@ -77,6 +88,10 @@ public class  MainGameScreen implements Screen {
         asteroids = new ArrayList<>();
         explosions = new ArrayList<>();
         scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
+
+        playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
+
+        blank = new Texture("blank.png");
 
         score = 0;
         /*
@@ -287,6 +302,12 @@ public class  MainGameScreen implements Screen {
             }
         }
 
+
+        // dopo aver mosso la navicella, aggiorniamo le collisioni (collisionReact)
+        playerReact.move(x,y);
+
+
+
         /* Dopo gli update di ogni oggetto, controlliamo le collisioni
            Eseguiamo un loop innestato, in modo che controlliamo se un proiettile ha una collisione con un
            qualsiasi proiettile presente nello schermo di gioco.
@@ -304,13 +325,22 @@ public class  MainGameScreen implements Screen {
         asteroids.removeAll(asteroidsToRemove); //rimuoviamo tutti gli asteroidi presenti nell' ArrayList da rimuovere
         bullets.removeAll(bulletsToRemove); //rimuoviamo tutti i proiettili presenti nell' ArrayList da rimuovere
 
+        for (Asteroid asteroid : asteroids){
+            if(asteroid.getCollisionReact().collidesWith(playerReact)){
+                asteroidsToRemove.add(asteroid);
+                health -= 0.1;
+            }
+        }
+
+        asteroids.removeAll(asteroidsToRemove);
+
         stateTime += delta;
 
         // il rendering funziona a layer, quindi l'ultima cosa che verrà reinderizzata sarà sopra le altre
         ScreenUtils.clear(0, 0, 0, 1);
         game.batch.begin();
 
-               for (Bullet bullet : bullets) {
+        for (Bullet bullet : bullets) {
             bullet.render(game.batch);
         }
 
@@ -321,6 +351,20 @@ public class  MainGameScreen implements Screen {
         for (Explosion explosion : explosions){
         explosion.render(game.batch);
         }
+
+/*
+        if(health > 0.6f){
+            game.batch.setColor(0,255,0,0);
+        }
+        else if(health > 0.2f){
+            game.batch.setColor(255,128,0,0);
+        }
+        else{
+            game.batch.setColor(255,0,0,0);
+        }
+*/
+        game.batch.draw(blank,0,0, Gdx.graphics.getWidth() * health, 5);
+        //game.batch.setColor(0,0,0,0);
 
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
 
