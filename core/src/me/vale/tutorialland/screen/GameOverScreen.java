@@ -60,6 +60,8 @@ public class GameOverScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.begin();
 
+        game.ScrollingBackground.updateAndRender(delta,game.batch);
+
         //disegnamo il banner nella parte alta dello schermo con 15 pixel di differenza (-15),
         game.batch.draw(gameOverBanner, Gdx.graphics.getWidth() /2 - BANNER_WITDH /2, Gdx.graphics.getHeight() - BANNER_HEIGHT - 15, BANNER_WITDH, BANNER_HEIGHT);
 

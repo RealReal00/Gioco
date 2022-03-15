@@ -45,6 +45,8 @@ public class MainMenuScreen implements Screen {
         ScreenUtils.clear(0.15f, 0.15f, 0.3f, 1);
         game.batch.begin();
 
+        game.ScrollingBackground.updateAndRender(delta,game.batch);
+
         int x = SpaceGame.WIDTH / 2 - EXIT_BUTTON_WIDTH /2;
         if (Gdx.input.getX() < x + EXIT_BUTTON_WIDTH && Gdx.input.getX() > x && SpaceGame.HEIGHT - Gdx.input.getY() < EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT && SpaceGame.HEIGHT - Gdx.input.getY() > EXIT_BUTTON_Y){
             game.batch.draw(exitButtonActive, x ,EXIT_BUTTON_Y, EXIT_BUTTON_WIDTH, EXIT_BUTTON_HEIGHT);

@@ -345,6 +345,8 @@ public class  MainGameScreen implements Screen {
         ScreenUtils.clear(0, 0, 0, 1);
         game.batch.begin();
 
+        game.ScrollingBackground.updateAndRender(delta,game.batch);
+
         for (Bullet bullet : bullets) {
             bullet.render(game.batch);
         }

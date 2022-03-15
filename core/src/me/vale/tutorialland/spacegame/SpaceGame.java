@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import me.vale.tutorialland.screen.GameOverScreen;
 import me.vale.tutorialland.screen.MainGameScreen;
 import me.vale.tutorialland.screen.MainMenuScreen;
+import me.vale.tutorialland.tools.ScrollingBackground;
 
 /*
 	Estendiamo SpaceGame con Game, dato che LibGdx ha una classe Game che ha molti tools per gestire menu ed altro,
@@ -22,7 +23,7 @@ public class SpaceGame extends Game {
 	sulla velocità del personaggio. Viaggiamo a 40pixel per secondo.*/
 
 	public SpriteBatch batch;
-
+	public ScrollingBackground ScrollingBackground;
 
 	/*
 	Quando avviamo il programma, il primo metodo che viene letto è "create".
@@ -30,6 +31,7 @@ public class SpaceGame extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
+		this.ScrollingBackground = new ScrollingBackground();
 		this.setScreen(new MainMenuScreen(this));
 
 	}
@@ -65,4 +67,9 @@ public class SpaceGame extends Game {
 		super.render();
 	}
 
+	public void resize(int width, int height) {
+		this.ScrollingBackground.resize(width,height);
+		super.resize(width,height);
+	}
 }
+
