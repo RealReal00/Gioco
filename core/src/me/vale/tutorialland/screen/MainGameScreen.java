@@ -352,19 +352,19 @@ public class  MainGameScreen implements Screen {
         explosion.render(game.batch);
         }
 
-/*
+
         if(health > 0.6f){
-            game.batch.setColor(0,255,0,0);
+            game.batch.setColor(0,255,0,1);
         }
         else if(health > 0.2f){
-            game.batch.setColor(255,128,0,0);
+            game.batch.setColor(255,128,0,1);
         }
         else{
-            game.batch.setColor(255,0,0,0);
+            game.batch.setColor(255,0,0,1);
         }
-*/
+
         game.batch.draw(blank,0,0, Gdx.graphics.getWidth() * health, 5);
-        //game.batch.setColor(0,0,0,0);
+        game.batch.setColor(255,255,255,1);
 
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
 
