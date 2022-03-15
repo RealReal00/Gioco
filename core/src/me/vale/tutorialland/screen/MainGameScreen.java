@@ -15,11 +15,9 @@ import me.vale.tutorialland.entities.Asteroid;
 import me.vale.tutorialland.entities.Bullet;
 import me.vale.tutorialland.tools.CollisionReact;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static java.awt.Color.white;
 
 public class  MainGameScreen implements Screen {
 

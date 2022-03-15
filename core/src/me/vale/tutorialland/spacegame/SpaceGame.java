@@ -2,6 +2,7 @@ package me.vale.tutorialland.spacegame;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import me.vale.tutorialland.screen.GameOverScreen;
 import me.vale.tutorialland.screen.MainGameScreen;
 import me.vale.tutorialland.screen.MainMenuScreen;
 
@@ -29,7 +30,7 @@ public class SpaceGame extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		this.setScreen(new MainMenuScreen(this));
+		this.setScreen(new GameOverScreen(this, 0));
 
 	}
 
