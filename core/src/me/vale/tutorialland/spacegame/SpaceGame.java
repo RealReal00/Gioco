@@ -30,7 +30,7 @@ public class SpaceGame extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		this.setScreen(new GameOverScreen(this, 0));
+		this.setScreen(new MainMenuScreen(this));
 
 	}
 

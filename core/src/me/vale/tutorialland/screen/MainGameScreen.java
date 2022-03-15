@@ -327,6 +327,13 @@ public class  MainGameScreen implements Screen {
             if(asteroid.getCollisionReact().collidesWith(playerReact)){
                 asteroidsToRemove.add(asteroid);
                 health -= 0.1;
+
+                //if health is depleted go to game over screen
+                if(health <= 0){
+                    this.dispose(); //causes the JFrame window to be destroyed and cleaned up by the operating system
+                    game.setScreen(new GameOverScreen(game, score));
+                    return;
+                }
             }
         }
 
