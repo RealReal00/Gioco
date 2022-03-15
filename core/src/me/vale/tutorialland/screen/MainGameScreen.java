@@ -122,7 +122,7 @@ public class  MainGameScreen implements Screen {
         rolls[3] = new Animation<>(SHIP_ANIMATION_SPEED, rollSpriteSheet[3]);
         rolls[4] = new Animation<>(SHIP_ANIMATION_SPEED, rollSpriteSheet[4]);//ANIMAZIONE VERSO DESTRA
 
-
+        game.ScrollingBackground.setSpeedFixed(false);
 
     }
 

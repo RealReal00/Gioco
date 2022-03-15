@@ -1,7 +1,9 @@
 package me.vale.tutorialland.spacegame;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import me.vale.tutorialland.screen.GameOverScreen;
 import me.vale.tutorialland.screen.MainGameScreen;
 import me.vale.tutorialland.screen.MainMenuScreen;
@@ -24,6 +26,10 @@ public class SpaceGame extends Game {
 
 	public SpriteBatch batch;
 	public ScrollingBackground ScrollingBackground;
+
+	private OrthographicCamera cam; // controlla
+	private StretchViewport viewport; // indifferentemente dal tipo di smartphone e rapporto dello schermo, viene streachata l'immagine in modo da coprire
+									  // l'intero schermo
 
 	/*
 	Quando avviamo il programma, il primo metodo che viene letto è "create".

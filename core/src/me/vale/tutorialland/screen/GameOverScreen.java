@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import me.vale.tutorialland.spacegame.SpaceGame;
+import me.vale.tutorialland.tools.ScrollingBackground;
 
 public class GameOverScreen implements Screen {
 
@@ -69,6 +70,9 @@ public class GameOverScreen implements Screen {
         GlyphLayout highscoreLayout = new GlyphLayout(scoreFont, "Highscore :\n" + highscore, Color.WHITE, 0, Align.left, false );
         scoreFont.draw(game.batch, scoreLayout, Gdx.graphics.getWidth()/2-scoreLayout.width /2, Gdx.graphics.getHeight() - BANNER_HEIGHT - 15 * 2);
         scoreFont.draw(game.batch, highscoreLayout, Gdx.graphics.getWidth()/2-highscoreLayout.width /2, Gdx.graphics.getHeight() - BANNER_HEIGHT - scoreLayout.height- 15 * 3);
+
+        game.ScrollingBackground.setSpeedFixed(true);
+        game.ScrollingBackground.setSpeed(ScrollingBackground.DEFAULT_SPEED);
 
         GlyphLayout tryAgainLayout = new GlyphLayout(scoreFont, "Try Again");
         GlyphLayout mainMenuLayout = new GlyphLayout(scoreFont,"Main Menu");
