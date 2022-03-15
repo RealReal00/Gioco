@@ -61,9 +61,7 @@ public class ScrollingBackground {
             y2 = y1 + image.getHeight() * imageScale ;
         }
 
-        System.out.println("y1:" + y1 + " --- y2:" + y2);
         //Render
-
         batch.draw(image, 0, y1, Gdx.graphics.getWidth(),image.getHeight() * imageScale );
         batch.draw(image, 0, y2, Gdx.graphics.getWidth(),image.getHeight() * imageScale );
 
