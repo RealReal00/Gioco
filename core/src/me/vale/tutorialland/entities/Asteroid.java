@@ -3,6 +3,7 @@ package me.vale.tutorialland.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.tools.CollisionReact;
 
 import java.util.Random;
@@ -30,7 +31,7 @@ public class Asteroid {
 
     public Asteroid(float x) {
         this.x = x;
-        this.y = Gdx.graphics.getHeight();
+        this.y = SpaceGame.HEIGHT;
         this.react = new CollisionReact(x, y, WIDTH, HEIGHT);
 
         if (texture == null) {

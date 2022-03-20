@@ -64,12 +64,12 @@ public class GameOverScreen implements Screen {
         game.ScrollingBackground.updateAndRender(delta,game.batch);
 
         //disegnamo il banner nella parte alta dello schermo con 15 pixel di differenza (-15),
-        game.batch.draw(gameOverBanner, Gdx.graphics.getWidth() /2 - BANNER_WITDH /2, Gdx.graphics.getHeight() - BANNER_HEIGHT - 15, BANNER_WITDH, BANNER_HEIGHT);
+        game.batch.draw(gameOverBanner, SpaceGame.WIDTH /2 - BANNER_WITDH /2, SpaceGame.HEIGHT - BANNER_HEIGHT - 15, BANNER_WITDH, BANNER_HEIGHT);
 
         GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "Score :\n" + score, Color.WHITE, 0, Align.left, false );
         GlyphLayout highscoreLayout = new GlyphLayout(scoreFont, "Highscore :\n" + highscore, Color.WHITE, 0, Align.left, false );
-        scoreFont.draw(game.batch, scoreLayout, Gdx.graphics.getWidth()/2-scoreLayout.width /2, Gdx.graphics.getHeight() - BANNER_HEIGHT - 15 * 2);
-        scoreFont.draw(game.batch, highscoreLayout, Gdx.graphics.getWidth()/2-highscoreLayout.width /2, Gdx.graphics.getHeight() - BANNER_HEIGHT - scoreLayout.height- 15 * 3);
+        scoreFont.draw(game.batch, scoreLayout, SpaceGame.WIDTH/2-scoreLayout.width /2, SpaceGame.HEIGHT - BANNER_HEIGHT - 15 * 2);
+        scoreFont.draw(game.batch, highscoreLayout, SpaceGame.WIDTH/2-highscoreLayout.width /2, SpaceGame.HEIGHT - BANNER_HEIGHT - scoreLayout.height- 15 * 3);
 
         game.ScrollingBackground.setSpeedFixed(true);
         game.ScrollingBackground.setSpeed(ScrollingBackground.DEFAULT_SPEED);
@@ -77,12 +77,12 @@ public class GameOverScreen implements Screen {
         GlyphLayout tryAgainLayout = new GlyphLayout(scoreFont, "Try Again");
         GlyphLayout mainMenuLayout = new GlyphLayout(scoreFont,"Main Menu");
 
-        float tryAgainX = Gdx.graphics.getWidth() / 2 - tryAgainLayout.width /2;
-        float tryAgainY = Gdx.graphics.getHeight() / 2 - tryAgainLayout.height /2;
-        float mainMenuX = Gdx.graphics.getWidth() / 2 - tryAgainLayout.width /2;
-        float mainMenuY = Gdx.graphics.getHeight() / 2 - tryAgainLayout.height /2 - tryAgainLayout.height - 15;
+        float tryAgainX = SpaceGame.WIDTH / 2 - tryAgainLayout.width /2;
+        float tryAgainY = SpaceGame.HEIGHT / 2 - tryAgainLayout.height /2;
+        float mainMenuX = SpaceGame.WIDTH / 2 - tryAgainLayout.width /2;
+        float mainMenuY = SpaceGame.HEIGHT / 2 - tryAgainLayout.height /2 - tryAgainLayout.height - 15;
 
-        float touchX = Gdx.input.getX(), touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+        float touchX = game.cam.getInputInGameWorld().x, touchY = SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y;
 
         //IF "TRY AGAIN" AND "MAIN MENU" IS BEING PRESS
 

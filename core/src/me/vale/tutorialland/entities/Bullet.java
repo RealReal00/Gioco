@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import me.vale.tutorialland.screen.MainGameScreen;
+import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.tools.CollisionReact;
 
 public class Bullet {
@@ -31,7 +32,7 @@ public class Bullet {
 
     public void update(float deltaTime) {
         y += SPEED * deltaTime;
-        if (y > Gdx.graphics.getHeight()) {
+        if (y > SpaceGame.HEIGHT) {
             remove = true;
         }
         react.move(x,y); //aggiorniamo la posizione del bullet per verificare le collisioni

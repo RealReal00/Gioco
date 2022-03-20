@@ -41,20 +41,20 @@ public class MainMenuScreen implements Screen {
         Gdx.input.setInputProcessor(new InputAdapter() {
 
             /*
-            Usiamo touchDown
+            Usiamo touchDown per rilevare dove viena lasciata la pressione sullo schermo non per quando avviene
              */
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 //Exit button
                 int x = SpaceGame.WIDTH / 2 - EXIT_BUTTON_WIDTH /2;
-                if (Gdx.input.getX() < x + EXIT_BUTTON_WIDTH && Gdx.input.getX() > x && SpaceGame.HEIGHT - Gdx.input.getY() < EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT && SpaceGame.HEIGHT - Gdx.input.getY() > EXIT_BUTTON_Y){
+                if (game.cam.getInputInGameWorld().x < x + EXIT_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > EXIT_BUTTON_Y){
                     mainMenuScreen.dispose();
                     Gdx.app.exit();
                 }
 
                 //Play button
                 x = SpaceGame.WIDTH / 2 - PLAY_BUTTON_WIDTH /2;
-                if (Gdx.input.getX() < x + PLAY_BUTTON_WIDTH && Gdx.input.getX() > x && SpaceGame.HEIGHT - Gdx.input.getY() < PLAY_BUTTON_Y + PLAY_BUTTON_HEIGHT && SpaceGame.HEIGHT - Gdx.input.getY() > PLAY_BUTTON_Y) {
+                if (game.cam.getInputInGameWorld().x < x + PLAY_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < PLAY_BUTTON_Y + PLAY_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > PLAY_BUTTON_Y) {
                     mainMenuScreen.dispose();
                     game.setScreen(new MainGameScreen(game));
                 }
@@ -81,7 +81,7 @@ public class MainMenuScreen implements Screen {
         game.ScrollingBackground.updateAndRender(delta,game.batch);
 
         int x = SpaceGame.WIDTH / 2 - EXIT_BUTTON_WIDTH /2;
-        if (Gdx.input.getX() < x + EXIT_BUTTON_WIDTH && Gdx.input.getX() > x && SpaceGame.HEIGHT - Gdx.input.getY() < EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT && SpaceGame.HEIGHT - Gdx.input.getY() > EXIT_BUTTON_Y){
+        if (game.cam.getInputInGameWorld().x < x + EXIT_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > EXIT_BUTTON_Y){
             game.batch.draw(exitButtonActive, x ,EXIT_BUTTON_Y, EXIT_BUTTON_WIDTH, EXIT_BUTTON_HEIGHT);
 
         }else{
@@ -91,15 +91,15 @@ public class MainMenuScreen implements Screen {
         /*
         Se il cursore del mouse si trova all'interno del tasto, viene caricata l'immagine gialla del tasto,
         per evidenziare il fatto che stiamo selezionando quella scelta.
-        Gdx.input.getX() <- posizione asse x del mouse
-        Gdx.input.getY() <- posizione asse y del mouse
+        game.cam.getInputInGameWorld().x <- posizione asse x del mouse
+        game.cam.getInputInGameWorld().y <- posizione asse y del mouse
 
-        if(Gdx.input.getX() < x + PLAY_BUTTON_WIDTH && Gdx.input.getX() > x)   <- se il mouse si trova
+        if(game.cam.getInputInGameWorld().x < x + PLAY_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x)   <- se il mouse si trova
                                                                             all'interno della scritta
         e ripetiamo la stessa cosa per l'asse y.
         */
         x = SpaceGame.WIDTH /2 - PLAY_BUTTON_WIDTH /2;
-        if (Gdx.input.getX() < x + PLAY_BUTTON_WIDTH && Gdx.input.getX() > x && SpaceGame.HEIGHT - Gdx.input.getY() < PLAY_BUTTON_Y + PLAY_BUTTON_HEIGHT && SpaceGame.HEIGHT - Gdx.input.getY() > PLAY_BUTTON_Y){
+        if (game.cam.getInputInGameWorld().x < x + PLAY_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < PLAY_BUTTON_Y + PLAY_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > PLAY_BUTTON_Y){
             game.batch.draw(playButtonActive, x ,PLAY_BUTTON_Y, PLAY_BUTTON_WIDTH, PLAY_BUTTON_HEIGHT);
         }else{
             game.batch.draw(playButtonInactive, x ,PLAY_BUTTON_Y, PLAY_BUTTON_WIDTH, PLAY_BUTTON_HEIGHT);

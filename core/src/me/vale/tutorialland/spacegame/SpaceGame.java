@@ -1,12 +1,13 @@
 package me.vale.tutorialland.spacegame;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import me.vale.tutorialland.screen.GameOverScreen;
-import me.vale.tutorialland.screen.MainGameScreen;
 import me.vale.tutorialland.screen.MainMenuScreen;
+import me.vale.tutorialland.tools.GameCamera;
 import me.vale.tutorialland.tools.ScrollingBackground;
 
 /*
@@ -19,6 +20,8 @@ public class SpaceGame extends Game {
 
 	public static final int WIDTH = 480;
 	public static final int HEIGHT = 720;
+	public static boolean IS_MOBILE = false;
+
 	/*
 	Utilizziamo la variabile per modificare la velocità del personaggio, in questo modo la nostra velocità rimarrà
 	fissa, ovvero viaggeremo per "40 x DeltaTime", in questo modo qualsiasi sia il refreshRate non avremmo differenza
@@ -26,10 +29,8 @@ public class SpaceGame extends Game {
 
 	public SpriteBatch batch;
 	public ScrollingBackground ScrollingBackground;
+	public GameCamera cam;
 
-	private OrthographicCamera cam; // controlla
-	private StretchViewport viewport; // indifferentemente dal tipo di smartphone e rapporto dello schermo, viene streachata l'immagine in modo da coprire
-									  // l'intero schermo
 
 	/*
 	Quando avviamo il programma, il primo metodo che viene letto è "create".
@@ -37,6 +38,13 @@ public class SpaceGame extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
+		cam = new GameCamera(WIDTH, HEIGHT);
+
+
+		if(Gdx.app.getType() == Application.ApplicationType.Android || Gdx.app.getType() == Application.ApplicationType.iOS){
+			IS_MOBILE = true;
+		}
+
 		this.ScrollingBackground = new ScrollingBackground();
 		this.setScreen(new MainMenuScreen(this));
 
@@ -70,12 +78,18 @@ public class SpaceGame extends Game {
 
 	@Override
 	public void render () {
+
+		/* stiamo dicendo al batch che questa è la nostra camera e con .combined passiamo le matrici del nostro schermo
+		 e questo è come vogliamo che venga gestito, ovvero stretciato in base alla dimensione dello schermo. manteniamo il rapporto. */
+		batch.setProjectionMatrix(cam.combined());
 		super.render();
 	}
 
 	public void resize(int width, int height) {
-		this.ScrollingBackground.resize(width,height);
-		super.resize(width,height);
+			cam.update(width,height); //IN QUESTO MODO QUALSIASI SIA IL RAPPORTO DELLO SCHERMO LO ANDIAMO A RIDIMENSIONARE
+			super.resize(width,height);
+
+
 	}
 }
 

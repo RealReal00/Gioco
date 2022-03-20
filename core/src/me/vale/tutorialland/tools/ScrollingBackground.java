@@ -3,6 +3,7 @@ package me.vale.tutorialland.tools;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import me.vale.tutorialland.spacegame.SpaceGame;
 
 public class ScrollingBackground {
 
@@ -24,7 +25,7 @@ public class ScrollingBackground {
         y2 = image.getHeight();
         speed = 0;
         goalSpeed = DEFAULT_SPEED;
-        imageScale = 0;
+        imageScale = SpaceGame.WIDTH / image.getWidth();
         speedFixed = true;
     }
 
@@ -62,13 +63,8 @@ public class ScrollingBackground {
         }
 
         //Render
-        batch.draw(image, 0, y1, Gdx.graphics.getWidth(),image.getHeight() * imageScale );
-        batch.draw(image, 0, y2, Gdx.graphics.getWidth(),image.getHeight() * imageScale );
-
-    }
-
-    public void resize (int witdh, int height){
-        imageScale = witdh / image.getWidth(); //grandezza dell'immagine che ci serve per adattare l'altezza nel batch.draw
+        batch.draw(image, 0, y1, SpaceGame.WIDTH,image.getHeight() * imageScale );
+        batch.draw(image, 0, y2, SpaceGame.WIDTH,image.getHeight() * imageScale );
 
     }
 

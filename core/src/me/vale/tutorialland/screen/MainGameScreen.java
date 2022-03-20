@@ -3,6 +3,8 @@ package me.vale.tutorialland.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -57,11 +59,14 @@ public class  MainGameScreen implements Screen {
     float shootTimer;
     SpaceGame game;
 
+    Music music;
+
     ArrayList<Bullet> bullets;
     ArrayList<Asteroid> asteroids;
     ArrayList<Explosion> explosions;
 
     Texture blank;
+    Texture controls;
 
     BitmapFont scoreFont;
 
@@ -80,7 +85,7 @@ public class  MainGameScreen implements Screen {
     public MainGameScreen (SpaceGame game){
 
         this.game = game;
-        y = 15;
+        y = (float) SpaceGame.HEIGHT / 2 - (float) SHIP_HEIGHT / 2;
         x = (float) SpaceGame.WIDTH / 2 - (float) SHIP_WIDTH / 2;
         bullets = new ArrayList<>();
         asteroids = new ArrayList<>();
@@ -90,6 +95,10 @@ public class  MainGameScreen implements Screen {
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
 
         blank = new Texture("blank.png");
+
+        if(SpaceGame.IS_MOBILE){
+            controls = new Texture("controls.png");
+        }
 
         score = 0;
         /*
@@ -124,6 +133,11 @@ public class  MainGameScreen implements Screen {
 
         game.ScrollingBackground.setSpeedFixed(false);
 
+       /* Music music = Gdx.audio.newMusic(Gdx.files.internal(""));
+        music.setLooping(true);
+        music.setVolume(0.2f);
+        music.play();
+        */
     }
 
     @Override
@@ -136,20 +150,47 @@ public class  MainGameScreen implements Screen {
 
         //shooting code
         shootTimer += delta;
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && shootTimer >= SHOOT_WAIT_TIME) {
+        if ((isLeft() || isRight()) && shootTimer >= SHOOT_WAIT_TIME && SpaceGame.IS_MOBILE) {
             shootTimer = 0;
 
             int offset = 4;
 
-            if(roll == 1 || roll == 3){ //virata leggera (sia sinistra che destra)
+            if (roll == 1 || roll == 3) { //virata leggera (sia sinistra che destra)
                 offset = 8;
             }
 
-            if(roll == 0 || roll == 4){ //virata completa (sia sinistra che destra)
+            if (roll == 0 || roll == 4) { //virata completa (sia sinistra che destra)
                 offset = 16;
             }
 
-            bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH/2, y+ 40));
+
+            bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH / 2, y + 40));
+
+            if(score > 1000){
+                bullets.add(new Bullet(x + offset, y + 40));
+                bullets.add(new Bullet(x + SHIP_WIDTH - offset, y + 40));
+            }
+
+            if(score > 2500){
+                bullets.add(new Bullet(x + offset + 10, y + 40));
+                bullets.add(new Bullet(x + SHIP_WIDTH - offset - 10, y + 40));
+            }
+        }
+
+        if (shootTimer >= SHOOT_WAIT_TIME && !SpaceGame.IS_MOBILE && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            shootTimer = 0;
+
+            int offset = 4;
+
+            if (roll == 1 || roll == 3) { //virata leggera (sia sinistra che destra)
+                offset = 8;
+            }
+
+            if (roll == 0 || roll == 4) { //virata completa (sia sinistra che destra)
+                offset = 16;
+            }
+
+            bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH / 2, y + 40));
 
             if(score > 1000){
                 bullets.add(new Bullet(x + offset, y + 40));
@@ -163,11 +204,11 @@ public class  MainGameScreen implements Screen {
         }
 
         //Asteroids Spawn Code
-        //Gdx.graphics.getWidth() - Asteroid.WIDTH <- per evitare asteroidi tagliati sul bordo destro dello schermo
+        //SpaceGame.WIDTH - Asteroid.WIDTH <- per evitare asteroidi tagliati sul bordo destro dello schermo
         asteroidsSpawnTimer -= delta;
         if(asteroidsSpawnTimer <= 0){
             asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
-            asteroids.add(new Asteroid(random.nextInt(Gdx.graphics.getWidth() - Asteroid.WIDTH)));
+            asteroids.add(new Asteroid(random.nextInt(SpaceGame.WIDTH - Asteroid.WIDTH)));
         }
 
         //Update asteroids
@@ -204,15 +245,15 @@ public class  MainGameScreen implements Screen {
         //movement code
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        if (isUp()){
             y += SPEED * Gdx.graphics.getDeltaTime();
 
             //bordo superiore
-            if (y + SHIP_HEIGHT + 1 > Gdx.graphics.getHeight()) {
-                y = Gdx.graphics.getHeight() - SHIP_HEIGHT - 1;
+            if (y + SHIP_HEIGHT + 1 > SpaceGame.HEIGHT) {
+                y = SpaceGame.HEIGHT - SHIP_HEIGHT - 1;
             }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        if (isDown()) {
             y -= SPEED * Gdx.graphics.getDeltaTime();
 
             if (y < 0) {
@@ -223,7 +264,7 @@ public class  MainGameScreen implements Screen {
 // movimento verso sinistra
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        if (isLeft()) {
             x -= SPEED * Gdx.graphics.getDeltaTime();
 
             //bordo sinistro
@@ -232,7 +273,7 @@ public class  MainGameScreen implements Screen {
             }
 
             //aggiorniamo la virata a sinistra se siamo ancora in virata verso destra (movimento più fluido e naturale)
-            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && !Gdx.input.isKeyPressed(Input.Keys.RIGHT) && roll > 0) {
+            if (isJustLeft() && !isRight() && roll > 0) {
                 rollTimer = 0;
                 roll--;
             }
@@ -262,18 +303,18 @@ public class  MainGameScreen implements Screen {
 
 
 // movimento verso destra
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        if (isRight()) {
             x += SPEED * Gdx.graphics.getDeltaTime();
 
 
             //bordo destro
-            //Gdx.graphics.getWidth() <- screen width
-            if (x + SHIP_WIDTH > Gdx.graphics.getWidth()) {
-                x = Gdx.graphics.getWidth() - SHIP_WIDTH;
+            //SpaceGame.WIDTH <- screen width
+            if (x + SHIP_WIDTH > SpaceGame.WIDTH) {
+                x = SpaceGame.WIDTH - SHIP_WIDTH;
             }
 
             //aggiorniamo la virata a sinistra se siamo ancora in virata verso destra (movimento più fluido e naturale)
-            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && !Gdx.input.isKeyPressed(Input.Keys.LEFT) && roll > 0) {
+            if (isJustRight() && !isLeft() && roll > 0) {
                 rollTimer = 0;
                 if(roll < 4){
                 roll++;
@@ -345,6 +386,7 @@ public class  MainGameScreen implements Screen {
         ScreenUtils.clear(0, 0, 0, 1);
         game.batch.begin();
 
+
         game.ScrollingBackground.updateAndRender(delta,game.batch);
 
         for (Bullet bullet : bullets) {
@@ -361,27 +403,81 @@ public class  MainGameScreen implements Screen {
 
 
         if(health > 0.6f){
-            game.batch.setColor(0,255,0,1);
+            game.batch.setColor(Color.GREEN);
         }
         else if(health > 0.2f){
-            game.batch.setColor(255,128,0,1);
+            game.batch.setColor(Color.YELLOW);
         }
         else{
-            game.batch.setColor(255,0,0,1);
+            game.batch.setColor(Color.RED);
         }
 
-        game.batch.draw(blank,0,0, Gdx.graphics.getWidth() * health, 5);
-        game.batch.setColor(255,255,255,1);
+        game.batch.draw(blank,0,0, SpaceGame.WIDTH * health, 5);
+        game.batch.setColor(Color.WHITE);
 
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
 
 
         GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "" + score);
-        scoreFont.draw(game.batch, scoreLayout, (float)Gdx.graphics.getWidth() / 2 - scoreLayout.width / 2, Gdx.graphics.getHeight() - scoreLayout.height - 10);
+        scoreFont.draw(game.batch, scoreLayout, (float)SpaceGame.WIDTH / 2 - scoreLayout.width / 2, SpaceGame.HEIGHT - scoreLayout.height - 10);
 
+        if(SpaceGame.IS_MOBILE){
+            //draw left side
+            game.batch.setColor(Color.RED);
+            game.batch.draw(controls, 0 ,0, (float) SpaceGame.WIDTH/2, SpaceGame.HEIGHT, 0,0, SpaceGame.WIDTH /2, SpaceGame.HEIGHT ,false, false);
+
+            //draw right side
+            game.batch.setColor(Color.BLUE);
+            game.batch.draw(controls, (float) SpaceGame.WIDTH/2 ,0, (float) SpaceGame.WIDTH/2,SpaceGame.HEIGHT, 0,0,SpaceGame.WIDTH /2, SpaceGame.HEIGHT,true, false);
+            game.batch.setColor(Color.WHITE);
+        }
 
         game.batch.end();
 
+
+    }
+    /*
+    Impostiamo i metodi booleani per sapere se l'utente sta toccando la parte sinistra o destra dello schermo
+    dato che su smartphone non è possibile la gestione tramite la tastiera.
+
+    Il metodo "isRight()" ci ritorna 1 se è premuta la freccia destra da tastiera, oppure dividendo l'asse X a metà, la pressione deve risultare maggiore
+    del punto di divisione (parte destra).
+     */
+
+    private boolean isRight(){
+        // System.out.println("X:" + game.cam.getInputInGameWorld().x);
+        return Gdx.input.isKeyPressed(Input.Keys.RIGHT) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().x >= (float) SpaceGame.WIDTH /2);
+
+    }
+
+    private boolean isLeft(){
+        return Gdx.input.isKeyPressed(Input.Keys.LEFT) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().x < (float) SpaceGame.WIDTH /2);
+
+    }
+
+    private boolean isJustRight(){
+        return Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) || (Gdx.input.justTouched() && game.cam.getInputInGameWorld().x >= (float) SpaceGame.WIDTH /2);
+
+    }
+
+    private boolean isJustLeft(){
+        return Gdx.input.isKeyJustPressed(Input.Keys.LEFT) || (Gdx.input.justTouched() && game.cam.getInputInGameWorld().x < (float) SpaceGame.WIDTH /2);
+
+    }
+
+
+    /* lo '0' nell'asse x parte dal bordo inferiore, mentre nell'asse Y parte dal bordo superiore, per questo motivo nelle funzioni isUp() e isDown(),
+     controlliamo la Y sia minore della metà per salire, e maggiore della metà per scendere. (il valore della Y risulta specchiato, ovvero sotto-sopra).
+     Sono presenti le funzioni di stampa dei valori X e Y per vedere la posizione in base al puntatore del mouse
+     */
+    private boolean isUp(){
+        //System.out.println("Y:" + game.cam.getInputInGameWorld().y);
+        return Gdx.input.isKeyPressed(Input.Keys.UP) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().y < (float) SpaceGame.HEIGHT /2);
+
+    }
+
+    private boolean isDown(){
+        return Gdx.input.isKeyPressed(Input.Keys.DOWN) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().y > (float) SpaceGame.HEIGHT /2);
 
     }
 
