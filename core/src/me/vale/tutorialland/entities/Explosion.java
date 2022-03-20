@@ -26,7 +26,7 @@ public class Explosion {
         statetime = 0;
 
         if (anim == null) {
-            anim = new Animation(FRAME_LENGHT, TextureRegion.split(new Texture("explosion.png"), SIZE, SIZE)[0]);
+            anim = new Animation<>(FRAME_LENGHT, TextureRegion.split(new Texture("explosion.png"), SIZE, SIZE)[0]);
         }
     }
 

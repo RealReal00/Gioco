@@ -1,6 +1,5 @@
 package me.vale.tutorialland.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import me.vale.tutorialland.spacegame.SpaceGame;
@@ -17,7 +16,7 @@ public class Asteroid {
     public final int SPEED = random.nextInt(max-min)+min;
     public static final int WIDTH = 16;
     public static final int HEIGHT = 16;
-    private static Texture texture;
+    private Texture texture;
 
     float x, y;
     CollisionReact react;

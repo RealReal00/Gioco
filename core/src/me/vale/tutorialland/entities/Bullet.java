@@ -1,10 +1,7 @@
 package me.vale.tutorialland.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import me.vale.tutorialland.screen.MainGameScreen;
 import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.tools.CollisionReact;
 
@@ -12,7 +9,7 @@ public class Bullet {
     public static final int SPEED = 500;
     public static final int WIDTH = 3; //larghezza ed altezza sono presi dalle dimensioni dell'immagine.
     public static final int HEIGHT = 12;
-    private static Texture texture;
+    private Texture texture;
 
     float x, y;
     CollisionReact react;

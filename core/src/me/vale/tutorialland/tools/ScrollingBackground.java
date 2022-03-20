@@ -1,6 +1,5 @@
 package me.vale.tutorialland.tools;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import me.vale.tutorialland.spacegame.SpaceGame;
@@ -25,7 +24,7 @@ public class ScrollingBackground {
         y2 = image.getHeight();
         speed = 0;
         goalSpeed = DEFAULT_SPEED;
-        imageScale = SpaceGame.WIDTH / image.getWidth();
+        imageScale = (float) SpaceGame.WIDTH / image.getWidth();
         speedFixed = true;
     }
 

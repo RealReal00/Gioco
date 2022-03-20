@@ -64,12 +64,12 @@ public class GameOverScreen implements Screen {
         game.ScrollingBackground.updateAndRender(delta,game.batch);
 
         //disegnamo il banner nella parte alta dello schermo con 15 pixel di differenza (-15),
-        game.batch.draw(gameOverBanner, SpaceGame.WIDTH /2 - BANNER_WITDH /2, SpaceGame.HEIGHT - BANNER_HEIGHT - 15, BANNER_WITDH, BANNER_HEIGHT);
+        game.batch.draw(gameOverBanner, (float) SpaceGame.WIDTH /2 - (float) BANNER_WITDH /2, SpaceGame.HEIGHT - BANNER_HEIGHT - 15, BANNER_WITDH, BANNER_HEIGHT);
 
         GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "Score :\n" + score, Color.WHITE, 0, Align.left, false );
         GlyphLayout highscoreLayout = new GlyphLayout(scoreFont, "Highscore :\n" + highscore, Color.WHITE, 0, Align.left, false );
-        scoreFont.draw(game.batch, scoreLayout, SpaceGame.WIDTH/2-scoreLayout.width /2, SpaceGame.HEIGHT - BANNER_HEIGHT - 15 * 2);
-        scoreFont.draw(game.batch, highscoreLayout, SpaceGame.WIDTH/2-highscoreLayout.width /2, SpaceGame.HEIGHT - BANNER_HEIGHT - scoreLayout.height- 15 * 3);
+        scoreFont.draw(game.batch, scoreLayout, (float) SpaceGame.WIDTH/2-scoreLayout.width /2, SpaceGame.HEIGHT - BANNER_HEIGHT - 15 * 2);
+        scoreFont.draw(game.batch, highscoreLayout, (float) SpaceGame.WIDTH/2-highscoreLayout.width /2, SpaceGame.HEIGHT - BANNER_HEIGHT - scoreLayout.height- 15 * 3);
 
         game.ScrollingBackground.setSpeedFixed(true);
         game.ScrollingBackground.setSpeed(ScrollingBackground.DEFAULT_SPEED);
@@ -77,10 +77,10 @@ public class GameOverScreen implements Screen {
         GlyphLayout tryAgainLayout = new GlyphLayout(scoreFont, "Try Again");
         GlyphLayout mainMenuLayout = new GlyphLayout(scoreFont,"Main Menu");
 
-        float tryAgainX = SpaceGame.WIDTH / 2 - tryAgainLayout.width /2;
-        float tryAgainY = SpaceGame.HEIGHT / 2 - tryAgainLayout.height /2;
-        float mainMenuX = SpaceGame.WIDTH / 2 - tryAgainLayout.width /2;
-        float mainMenuY = SpaceGame.HEIGHT / 2 - tryAgainLayout.height /2 - tryAgainLayout.height - 15;
+        float tryAgainX = (float) SpaceGame.WIDTH / 2 - tryAgainLayout.width /2;
+        float tryAgainY = (float) SpaceGame.HEIGHT / 2 - tryAgainLayout.height /2;
+        float mainMenuX = (float) SpaceGame.WIDTH / 2 - tryAgainLayout.width /2;
+        float mainMenuY = (float) SpaceGame.HEIGHT / 2 - tryAgainLayout.height /2 - tryAgainLayout.height - 15;
 
         float touchX = game.cam.getInputInGameWorld().x, touchY = SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y;
 
