@@ -24,10 +24,6 @@ public class Asteroid {
     //l'oggetto è pubblico perchè possiamo rimuoverlo dalla lista che esternamente.
     public boolean remove = false;
 
-
-
-
-
     public Asteroid(float x) {
         this.x = x;
         this.y = SpaceGame.HEIGHT;

@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.entities.Explosion;
+import me.vale.tutorialland.entities.Heal;
 import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.entities.Asteroid;
 import me.vale.tutorialland.entities.Bullet;
@@ -41,6 +42,9 @@ public class  MainGameScreen implements Screen {
     public static final float MIN_ASTEROID_SPAWN_TIME = 0.3f; //minimo di tempo di spawn tra un asteroide e l'altro
     public static final float MAX_ASTEROID_SPAWN_TIME = 0.6f; //max tempo di spawn di un asteroide
 
+    //HEAL
+    public static final float MIN_HEAL_SPAWN_TIME = 6.5f; //minimo di tempo di spawn tra un asteroide e l'altro
+    public static final float MAX_HEAL_SPAWN_TIME = 10.5f; //max tempo di spawn di un asteroide
 
 
 
@@ -53,7 +57,7 @@ public class  MainGameScreen implements Screen {
     float stateTime; //usiamo come stato generale per l'animazione.
                     // La classe animazione
     float asteroidsSpawnTimer;
-
+    float healsSpawnTimer;
     Random random;
 
     float shootTimer;
@@ -64,6 +68,7 @@ public class  MainGameScreen implements Screen {
     ArrayList<Bullet> bullets;
     ArrayList<Asteroid> asteroids;
     ArrayList<Explosion> explosions;
+    ArrayList<Heal> heals;
 
     Texture blank;
     Texture controls;
@@ -90,6 +95,7 @@ public class  MainGameScreen implements Screen {
         bullets = new ArrayList<>();
         asteroids = new ArrayList<>();
         explosions = new ArrayList<>();
+        heals = new ArrayList<>();
         scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
 
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
@@ -108,6 +114,7 @@ public class  MainGameScreen implements Screen {
          */
         random = new Random();
         asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
+        healsSpawnTimer = random.nextFloat() * (MAX_HEAL_SPAWN_TIME - MIN_HEAL_SPAWN_TIME) + MIN_HEAL_SPAWN_TIME;
 
         shootTimer = 0;
 
@@ -211,6 +218,13 @@ public class  MainGameScreen implements Screen {
             asteroids.add(new Asteroid(random.nextInt(SpaceGame.WIDTH - Asteroid.WIDTH)));
         }
 
+        //heal spawn code
+        healsSpawnTimer -= delta;
+        if(healsSpawnTimer <= 0){
+            healsSpawnTimer = random.nextFloat() * (MAX_HEAL_SPAWN_TIME - MIN_HEAL_SPAWN_TIME) + MIN_HEAL_SPAWN_TIME;
+            heals.add(new Heal(random.nextInt(SpaceGame.WIDTH - Heal.WIDTH)));
+        }
+
         //Update asteroids
         ArrayList<Asteroid> asteroidsToRemove = new ArrayList<>();
         for (Asteroid asteroid : asteroids){
@@ -229,6 +243,16 @@ public class  MainGameScreen implements Screen {
                 bulletsToRemove.add(bullet); //se un bullet deve essere rimosso viene inserito nella lista delle rimozioni
             }
         }
+
+        //update heal
+        ArrayList<Heal> healsToRemove = new ArrayList<>();
+        for (Heal heal : heals){
+            heal.update(delta);
+            if(heal.remove){
+                healsToRemove.add(heal);
+            }
+        }
+        heals.removeAll(healsToRemove);
 
         //update explosions
         ArrayList<Explosion> explosionsToRemove = new ArrayList<>();
@@ -380,6 +404,22 @@ public class  MainGameScreen implements Screen {
 
         asteroids.removeAll(asteroidsToRemove);
 
+
+        for(Heal heal : heals) {
+            if (heal.getCollisionReact().collidesWith(playerReact)) {
+                healsToRemove.add(heal);
+
+                if(health <= 0.8)
+                health += 0.2;
+
+                if(health == 0.9 )
+                    health = 1;
+
+            }
+
+        }
+        heals.removeAll(healsToRemove);
+
         stateTime += delta;
 
         // il rendering funziona a layer, quindi l'ultima cosa che verrà reinderizzata sarà sopra le altre
@@ -400,6 +440,12 @@ public class  MainGameScreen implements Screen {
         for (Explosion explosion : explosions){
         explosion.render(game.batch);
         }
+
+        for (Heal heal : heals){
+            heal.render(game.batch);
+        }
+
+
 
 
         if(health > 0.6f){

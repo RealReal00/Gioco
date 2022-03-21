@@ -11,7 +11,6 @@ import me.vale.tutorialland.tools.ScrollingBackground;
 /*
 	Estendiamo SpaceGame con Game, dato che LibGdx ha una classe Game che ha molti tools per gestire menu ed altro,
 	che risultano molto utili. (ApplicationAdapter fa riferimento ad un app generica).
-
  */
 
 public class SpaceGame extends Game {
