@@ -42,6 +42,7 @@ public class SpaceGame extends Game {
 			IS_MOBILE = true;
 		}
 
+
 		this.ScrollingBackground = new ScrollingBackground();
 		this.setScreen(new MainMenuScreen(this));
 
