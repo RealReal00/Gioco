@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.entities.Explosion;
 import me.vale.tutorialland.entities.Heal;
+
 import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.entities.Asteroid;
 import me.vale.tutorialland.entities.Bullet;
@@ -48,7 +50,9 @@ public class  MainGameScreen implements Screen {
 
     public static final float WAIT_COMMAND = 2;
 
-
+    //SOUND
+    private final Sound shoot;
+    private Music music;
 
     Animation[] rolls;
     public float waitCommandCounter = 0;
@@ -65,13 +69,11 @@ public class  MainGameScreen implements Screen {
 
     float shootTimer;
     SpaceGame game;
-
-    Music music;
-
     ArrayList<Bullet> bullets;
     ArrayList<Asteroid> asteroids;
     ArrayList<Explosion> explosions;
     ArrayList<Heal> heals;
+
 
     Texture blank;
     Texture controls;
@@ -90,7 +92,7 @@ public class  MainGameScreen implements Screen {
     Dobbiamo impostare il batch come game.batch, perché il batch appartiene al game passato dalla classe main.
     */
 
-    public MainGameScreen (SpaceGame game){
+    public MainGameScreen(SpaceGame game){
 
         this.game = game;
         y = (float) SpaceGame.HEIGHT / 2 - (float) SHIP_HEIGHT / 2;
@@ -100,11 +102,10 @@ public class  MainGameScreen implements Screen {
         explosions = new ArrayList<>();
         heals = new ArrayList<>();
         scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
-
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
-
+        music = Gdx.audio.newMusic(Gdx.files.internal("8 Bit Universe.mp3"));
+        shoot = Gdx.audio.newSound(Gdx.files.internal("shootSound.mp3"));
         blank = new Texture("blank.png");
-
         if(SpaceGame.IS_MOBILE){
             controls = new Texture("controls.png");
         }
@@ -148,7 +149,11 @@ public class  MainGameScreen implements Screen {
         music.setVolume(0.2f);
         music.play();
         */
+
     }
+
+
+
 
     @Override
     public void show() {
@@ -157,6 +162,9 @@ public class  MainGameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+
+        music.setVolume(0.1f);
+        music.play();
 
         //shooting code
         shootTimer += delta;
@@ -173,6 +181,8 @@ public class  MainGameScreen implements Screen {
                 offset = 16;
             }
 
+            long id = shoot.play();
+            shoot.setVolume(id,0.2f);
 
             bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH / 2, y + 40));
 
@@ -190,6 +200,8 @@ public class  MainGameScreen implements Screen {
         if (shootTimer >= SHOOT_WAIT_TIME && !SpaceGame.IS_MOBILE && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             shootTimer = 0;
 
+
+
             int offset = 4;
 
             if (roll == 1 || roll == 3) { //virata leggera (sia sinistra che destra)
@@ -199,6 +211,9 @@ public class  MainGameScreen implements Screen {
             if (roll == 0 || roll == 4) { //virata completa (sia sinistra che destra)
                 offset = 16;
             }
+
+            long id = shoot.play();
+            shoot.setVolume(id,0.2f);
 
             bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH / 2, y + 40));
 
@@ -553,6 +568,7 @@ public class  MainGameScreen implements Screen {
 
     @Override
     public void dispose() {
-
+    shoot.dispose();
+    music.dispose();
     }
 }
