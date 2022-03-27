@@ -3,6 +3,7 @@ package me.vale.tutorialland.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,6 +18,8 @@ public class GameOverScreen implements Screen {
     private static final int BANNER_WITDH = 350;
     private static final int BANNER_HEIGHT = 100;
 
+    private final Sound gameOverFx = Gdx.audio.newSound(Gdx.files.internal("Game Over sound effect.mp3"));
+
     SpaceGame game;
     int score, highscore;
 
@@ -27,6 +30,8 @@ public class GameOverScreen implements Screen {
         this.game = game;
         this.score = score;
 
+        //SoundFX
+        gameOverFx.play();
 
         /*
         Ogni volta il gioco va a vedere nel file il tag di nome highscore e cerca il suo valore, se non è presente il tag highscore, usa il suo valore
@@ -99,6 +104,7 @@ public class GameOverScreen implements Screen {
                 this.dispose();
                 game.batch.end();
                 game.setScreen(new MainMenuScreen(game));
+
                 return;
             }
         }
@@ -132,6 +138,6 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        gameOverFx.dispose();
     }
 }

@@ -50,13 +50,14 @@ public class  MainGameScreen implements Screen {
 
     public static final float WAIT_COMMAND = 2;
 
-    //SOUND
-    final Sound shoot;
-    final Sound healFx;
-    final Sound explosionFx;
-    private final Music music;
+    //Sound & Music
+    private final Music music = Gdx.audio.newMusic(Gdx.files.internal("8 Bit Universe.mp3"));
+    private final Sound shoot = Gdx.audio.newSound(Gdx.files.internal("shootSound.mp3"));
+    private final Sound healFx = Gdx.audio.newSound(Gdx.files.internal("Heal Sound Effect.mp3"));
+    private final Sound explosionFx = Gdx.audio.newSound(Gdx.files.internal("Explosion Sound Effect.mp3"));
+    private final Sound hitFx = Gdx.audio.newSound(Gdx.files.internal("8-Bit Hit Sound Effect.mp3"));
 
-    Animation[] rolls;
+    Animation[]rolls;
     public float waitCommandCounter = 0;
 
     float x;
@@ -108,10 +109,7 @@ public class  MainGameScreen implements Screen {
         blank = new Texture("blank.png");
 
         //MUSIC & SOUNDFX
-        music = Gdx.audio.newMusic(Gdx.files.internal("8 Bit Universe.mp3"));
-        shoot = Gdx.audio.newSound(Gdx.files.internal("shootSound.mp3"));
-        healFx = Gdx.audio.newSound(Gdx.files.internal("Heal Sound Effect.mp3"));
-        explosionFx = Gdx.audio.newSound(Gdx.files.internal("Explosion Sound Effect.mp3"));
+
         if(SpaceGame.IS_MOBILE){
             controls = new Texture("controls.png");
         }
@@ -149,13 +147,6 @@ public class  MainGameScreen implements Screen {
         rolls[4] = new Animation<>(SHIP_ANIMATION_SPEED, rollSpriteSheet[4]);//ANIMAZIONE VERSO DESTRA
 
         game.ScrollingBackground.setSpeedFixed(false);
-
-       /* Music music = Gdx.audio.newMusic(Gdx.files.internal(""));
-        music.setLooping(true);
-        music.setVolume(0.2f);
-        music.play();
-        */
-
     }
 
 
@@ -169,7 +160,7 @@ public class  MainGameScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        music.setVolume(0.05f);
+        music.setVolume(0.1f);
         music.play();
 
         //shooting code
@@ -219,7 +210,7 @@ public class  MainGameScreen implements Screen {
             }
 
             long id = shoot.play();
-            shoot.setVolume(id,0.05f);
+            shoot.setVolume(id,0.2f);
 
             bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH / 2, y + 40));
 
@@ -408,11 +399,9 @@ public class  MainGameScreen implements Screen {
                     score += 100;
                     long idExplosion = explosionFx.play();
                     explosionFx.setVolume(idExplosion, 0.3f);
-
                 }
             }
         }
-
         asteroids.removeAll(asteroidsToRemove); //rimuoviamo tutti gli asteroidi presenti nell' ArrayList da rimuovere
         bullets.removeAll(bulletsToRemove); //rimuoviamo tutti i proiettili presenti nell' ArrayList da rimuovere
 
@@ -420,6 +409,7 @@ public class  MainGameScreen implements Screen {
             if(asteroid.getCollisionReact().collidesWith(playerReact)){
                 asteroidsToRemove.add(asteroid);
                 health -= 0.1;
+                hitFx.play();
 
                 //if health is depleted go to game over screen
                 if(health <= 0){
@@ -584,5 +574,6 @@ public class  MainGameScreen implements Screen {
     music.dispose();
     healFx.dispose();
     explosionFx.dispose();
+    hitFx.dispose();
     }
 }

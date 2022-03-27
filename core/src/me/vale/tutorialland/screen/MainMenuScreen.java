@@ -19,7 +19,8 @@ public class MainMenuScreen implements Screen {
     private static final int PLAY_BUTTON_Y = 100;
 
     private final Sound buttonFx;
-
+    private boolean exitButtonSound = false;
+    private boolean playButtonSound = false;
 
     final SpaceGame game;
 
@@ -44,14 +45,13 @@ public class MainMenuScreen implements Screen {
         Gdx.input.setInputProcessor(new InputAdapter() {
 
             /*
-            Usiamo touchDown per rilevare dove viena lasciata la pressione sullo schermo non per quando avviene
+            Usiamo touchDown per rilevare dove viene lasciata la pressione sullo schermo non per quando avviene
              */
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 //Exit button
                 int x = SpaceGame.WIDTH / 2 - EXIT_BUTTON_WIDTH /2;
                 if (game.cam.getInputInGameWorld().x < x + EXIT_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > EXIT_BUTTON_Y){
-                   // buttonFx.play();
                     mainMenuScreen.dispose();
                     Gdx.app.exit();
                 }
@@ -59,8 +59,6 @@ public class MainMenuScreen implements Screen {
                 //Play button
                 x = SpaceGame.WIDTH / 2 - PLAY_BUTTON_WIDTH /2;
                 if (game.cam.getInputInGameWorld().x < x + PLAY_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < PLAY_BUTTON_Y + PLAY_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > PLAY_BUTTON_Y) {
-                  //  long idButton = buttonFx.play();
-                    //buttonFx.setVolume(idButton, 1f);
                     mainMenuScreen.dispose();
                     game.setScreen(new MainGameScreen(game));
                 }
@@ -89,9 +87,15 @@ public class MainMenuScreen implements Screen {
         int x = SpaceGame.WIDTH / 2 - EXIT_BUTTON_WIDTH /2;
         if (game.cam.getInputInGameWorld().x < x + EXIT_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > EXIT_BUTTON_Y){
             game.batch.draw(exitButtonActive, x ,EXIT_BUTTON_Y, EXIT_BUTTON_WIDTH, EXIT_BUTTON_HEIGHT);
+            if(!exitButtonSound){
+                buttonFx.play();
+                exitButtonSound = true;
+                playButtonSound = false;
+            }
 
         }else{
             game.batch.draw(exitButtonInactive, x ,EXIT_BUTTON_Y, EXIT_BUTTON_WIDTH, EXIT_BUTTON_HEIGHT);
+            exitButtonSound = false;
         }
 
         /*
@@ -101,14 +105,19 @@ public class MainMenuScreen implements Screen {
         game.cam.getInputInGameWorld().y <- posizione asse y del mouse
 
         if(game.cam.getInputInGameWorld().x < x + PLAY_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x)   <- se il mouse si trova
-                                                                            all'interno della scritta
-        e ripetiamo la stessa cosa per l'asse y.
+        all'interno della scritta e ripetiamo la stessa cosa per l'asse y.
         */
         x = SpaceGame.WIDTH /2 - PLAY_BUTTON_WIDTH /2;
         if (game.cam.getInputInGameWorld().x < x + PLAY_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < PLAY_BUTTON_Y + PLAY_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > PLAY_BUTTON_Y){
             game.batch.draw(playButtonActive, x ,PLAY_BUTTON_Y, PLAY_BUTTON_WIDTH, PLAY_BUTTON_HEIGHT);
+            if(!playButtonSound){
+                buttonFx.play();
+                exitButtonSound = false;
+                playButtonSound = true;
+            }
         }else{
             game.batch.draw(playButtonInactive, x ,PLAY_BUTTON_Y, PLAY_BUTTON_WIDTH, PLAY_BUTTON_HEIGHT);
+            playButtonSound = false;
         }
 
 

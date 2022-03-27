@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 public class GameCamera {
 
     private final OrthographicCamera cam; // controlla
-    private final StretchViewport viewport; // indifferentemente dal tipo di smartphone e rapporto dello schermo, viene streachata l'immagine in modo da coprire l'intero schermo
+    private final StretchViewport viewport; // indifferentemente dal tipo di smartphone e rapporto dello schermo, viene streachata l'immagine in modo da coprire interamente lo schermo
 
     public GameCamera (int width, int height){
 

@@ -21,7 +21,7 @@ public class Asteroid {
     float x, y;
     CollisionReact react;
 
-    //l'oggetto è pubblico perchè possiamo rimuoverlo dalla lista che esternamente.
+    //l'oggetto è pubblico perché possiamo rimuoverlo dalla lista che esternamente.
     public boolean remove = false;
 
     public Asteroid(float x) {
