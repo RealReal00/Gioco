@@ -2,6 +2,7 @@ package me.vale.tutorialland.tools;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import me.vale.tutorialland.screen.MainGameScreen;
 import me.vale.tutorialland.spacegame.SpaceGame;
 
 public class ScrollingBackground {
@@ -16,12 +17,14 @@ public class ScrollingBackground {
     int goalSpeed; //velocità massima di movimento da raggiungere
     float imageScale;
     boolean speedFixed;
+    public boolean screenChange = false;
 
     public ScrollingBackground() {
-        image = new Texture("stars_background.png");
+
+        image = new Texture("spaceBackgrondMoon.jpg");
 
         y1 = 0;
-        y2 = image.getHeight();
+        y2 = image.getHeight() - 150;
         speed = 0;
         goalSpeed = DEFAULT_SPEED;
         imageScale = (float) SpaceGame.WIDTH / image.getWidth();
@@ -30,6 +33,14 @@ public class ScrollingBackground {
 
     public void updateAndRender(float deltaTime, SpriteBatch batch) {
         //Speed adjustemnt to reach goal
+
+        if(MainGameScreen.score > 1000 && !screenChange){
+            image.dispose();
+            screenChange = true;
+        }
+        if(MainGameScreen.score > 1000){
+            image = new Texture("drawSpace.jpg");
+        }
 
         if (speed < goalSpeed) {
             speed += GOAL_REACH_ACCELLERATION * deltaTime;

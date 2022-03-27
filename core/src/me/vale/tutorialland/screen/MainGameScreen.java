@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.entities.Explosion;
 import me.vale.tutorialland.entities.Heal;
@@ -86,7 +87,7 @@ public class  MainGameScreen implements Screen {
     CollisionReact playerReact;
 
     float health = 1; //0 = dead, 1 = full health
-    int score;
+    public static int score;
 
     /* Quando creiamo il costruttore di MainGameScreen, passiamo "SpaceGame Game" cosi dentro questa classe siamo in
     grado di accedere alla classe principale "SpaceGame". In questo modo accediamo al batch (dobbiamo definirlo public),
@@ -108,13 +109,15 @@ public class  MainGameScreen implements Screen {
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
         blank = new Texture("blank.png");
 
+        new PointLight();
+        
         //MUSIC & SOUNDFX
 
         if(SpaceGame.IS_MOBILE){
             controls = new Texture("controls.png");
         }
 
-        score = 0;
+        score = 1000;
         /*
         Random.nextfloat() genera un numero random compreso tra 0 e 1
         in pratica quello che facciamo e fare un calcolo random + aggiungiamo 0.3s al risultato in modo da avere uno spawn
