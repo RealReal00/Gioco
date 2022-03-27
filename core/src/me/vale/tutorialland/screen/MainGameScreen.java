@@ -51,8 +51,10 @@ public class  MainGameScreen implements Screen {
     public static final float WAIT_COMMAND = 2;
 
     //SOUND
-    private final Sound shoot;
-    private Music music;
+    final Sound shoot;
+    final Sound healFx;
+    final Sound explosionFx;
+    private final Music music;
 
     Animation[] rolls;
     public float waitCommandCounter = 0;
@@ -103,9 +105,13 @@ public class  MainGameScreen implements Screen {
         heals = new ArrayList<>();
         scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
+        blank = new Texture("blank.png");
+
+        //MUSIC & SOUNDFX
         music = Gdx.audio.newMusic(Gdx.files.internal("8 Bit Universe.mp3"));
         shoot = Gdx.audio.newSound(Gdx.files.internal("shootSound.mp3"));
-        blank = new Texture("blank.png");
+        healFx = Gdx.audio.newSound(Gdx.files.internal("Heal Sound Effect.mp3"));
+        explosionFx = Gdx.audio.newSound(Gdx.files.internal("Explosion Sound Effect.mp3"));
         if(SpaceGame.IS_MOBILE){
             controls = new Texture("controls.png");
         }
@@ -163,7 +169,7 @@ public class  MainGameScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        music.setVolume(0.1f);
+        music.setVolume(0.05f);
         music.play();
 
         //shooting code
@@ -213,7 +219,7 @@ public class  MainGameScreen implements Screen {
             }
 
             long id = shoot.play();
-            shoot.setVolume(id,0.2f);
+            shoot.setVolume(id,0.05f);
 
             bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH / 2, y + 40));
 
@@ -400,9 +406,13 @@ public class  MainGameScreen implements Screen {
                     asteroidsToRemove.add(asteroid);
                     explosions.add(new Explosion(asteroid.getX(),asteroid.getY()));
                     score += 100;
+                    long idExplosion = explosionFx.play();
+                    explosionFx.setVolume(idExplosion, 0.3f);
+
                 }
             }
         }
+
         asteroids.removeAll(asteroidsToRemove); //rimuoviamo tutti gli asteroidi presenti nell' ArrayList da rimuovere
         bullets.removeAll(bulletsToRemove); //rimuoviamo tutti i proiettili presenti nell' ArrayList da rimuovere
 
@@ -433,6 +443,8 @@ public class  MainGameScreen implements Screen {
                 if(health == 0.9 )
                     health = 1;
 
+                long idHeal = healFx.play();
+                healFx.setVolume(idHeal,1f);
             }
 
         }
@@ -570,5 +582,7 @@ public class  MainGameScreen implements Screen {
     public void dispose() {
     shoot.dispose();
     music.dispose();
+    healFx.dispose();
+    explosionFx.dispose();
     }
 }

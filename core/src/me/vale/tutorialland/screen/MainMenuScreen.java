@@ -3,6 +3,7 @@ package me.vale.tutorialland.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.spacegame.SpaceGame;
@@ -17,6 +18,7 @@ public class MainMenuScreen implements Screen {
     private static final int EXIT_BUTTON_Y = 50;
     private static final int PLAY_BUTTON_Y = 100;
 
+    private final Sound buttonFx;
 
 
     final SpaceGame game;
@@ -28,6 +30,7 @@ public class MainMenuScreen implements Screen {
 
     public MainMenuScreen (final SpaceGame game){
         this.game = game;
+        buttonFx = Gdx.audio.newSound(Gdx.files.internal("Sound Effects Button.mp3"));
         playButtonActive = new Texture("play_button_active.png");
         playButtonInactive = new Texture("play_button_inactive.png");
         exitButtonActive = new Texture("exit_button_active.png");
@@ -48,6 +51,7 @@ public class MainMenuScreen implements Screen {
                 //Exit button
                 int x = SpaceGame.WIDTH / 2 - EXIT_BUTTON_WIDTH /2;
                 if (game.cam.getInputInGameWorld().x < x + EXIT_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > EXIT_BUTTON_Y){
+                   // buttonFx.play();
                     mainMenuScreen.dispose();
                     Gdx.app.exit();
                 }
@@ -55,6 +59,8 @@ public class MainMenuScreen implements Screen {
                 //Play button
                 x = SpaceGame.WIDTH / 2 - PLAY_BUTTON_WIDTH /2;
                 if (game.cam.getInputInGameWorld().x < x + PLAY_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < PLAY_BUTTON_Y + PLAY_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > PLAY_BUTTON_Y) {
+                  //  long idButton = buttonFx.play();
+                    //buttonFx.setVolume(idButton, 1f);
                     mainMenuScreen.dispose();
                     game.setScreen(new MainGameScreen(game));
                 }
@@ -134,5 +140,6 @@ public class MainMenuScreen implements Screen {
     @Override
     public void dispose() {
         Gdx.input.setInputProcessor(null);
+        buttonFx.dispose();
     }
 }
