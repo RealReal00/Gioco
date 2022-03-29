@@ -13,12 +13,9 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.utils.ScreenUtils;
-import me.vale.tutorialland.entities.Explosion;
-import me.vale.tutorialland.entities.Heal;
+import me.vale.tutorialland.entities.*;
 
 import me.vale.tutorialland.spacegame.SpaceGame;
-import me.vale.tutorialland.entities.Asteroid;
-import me.vale.tutorialland.entities.Bullet;
 import me.vale.tutorialland.tools.CollisionReact;
 
 import java.util.ArrayList;
@@ -26,7 +23,6 @@ import java.util.Random;
 
 
 public class  MainGameScreen implements Screen {
-
 
     public static final float SPEED = 400;
     public static final float SHIP_ANIMATION_SPEED = 0.5f;
@@ -49,6 +45,11 @@ public class  MainGameScreen implements Screen {
     public static final float MIN_HEAL_SPAWN_TIME = 8.5f; //minimo di tempo di spawn tra un asteroide e l'altro
     public static final float MAX_HEAL_SPAWN_TIME = 10.5f; //max tempo di spawn di un asteroide
 
+    //REVERSE
+    public static final float MIN_REVERSE_SPAWN_TIME = 1f; //minimo di tempo di spawn tra un reverse e l'altro
+    public static final float MAX_REVERSE_SPAWN_TIME = 3f; //max tempo di spawn di un reverse
+    public static final float REVERSE_WAIT_TIME = 15;
+
     public static final float WAIT_COMMAND = 2;
 
     //Sound & Music
@@ -59,7 +60,8 @@ public class  MainGameScreen implements Screen {
     private final Sound hitFx = Gdx.audio.newSound(Gdx.files.internal("8-Bit Hit Sound Effect.mp3"));
 
     Animation[]rolls;
-    public float waitCommandCounter = 0;
+    private float waitCommandCounter = 0;
+    private float waitReverseCounter = 0;
 
     float x;
     float y;
@@ -69,7 +71,11 @@ public class  MainGameScreen implements Screen {
                     // La classe animazione
     float asteroidsSpawnTimer;
     float healsSpawnTimer;
+    float reverseSpawnTimer;
+
     Random random;
+
+    public boolean reverseMalus = false;
 
     float shootTimer;
     SpaceGame game;
@@ -77,7 +83,7 @@ public class  MainGameScreen implements Screen {
     ArrayList<Asteroid> asteroids;
     ArrayList<Explosion> explosions;
     ArrayList<Heal> heals;
-
+    ArrayList<Reverse> reverses;
 
     Texture blank;
     Texture controls;
@@ -104,6 +110,7 @@ public class  MainGameScreen implements Screen {
         bullets = new ArrayList<>();
         asteroids = new ArrayList<>();
         explosions = new ArrayList<>();
+        reverses = new ArrayList<>();
         heals = new ArrayList<>();
         scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
@@ -126,6 +133,8 @@ public class  MainGameScreen implements Screen {
         random = new Random();
         asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
         healsSpawnTimer = random.nextFloat() * (MAX_HEAL_SPAWN_TIME - MIN_HEAL_SPAWN_TIME) + MIN_HEAL_SPAWN_TIME;
+        reverseSpawnTimer = random.nextFloat() * (MAX_REVERSE_SPAWN_TIME - MIN_REVERSE_SPAWN_TIME) + MIN_REVERSE_SPAWN_TIME;
+
 
         shootTimer = 0;
 
@@ -243,6 +252,14 @@ public class  MainGameScreen implements Screen {
             heals.add(new Heal(random.nextInt(SpaceGame.WIDTH - Heal.WIDTH)));
         }
 
+        //reverse spawn code
+        reverseSpawnTimer -= delta;
+        if(reverseSpawnTimer <= 0){
+            reverseSpawnTimer = random.nextFloat() *(MAX_REVERSE_SPAWN_TIME - MIN_REVERSE_SPAWN_TIME) + MIN_REVERSE_SPAWN_TIME;
+            reverses.add(new Reverse(random.nextInt(SpaceGame.WIDTH - Reverse.WIDTH)));
+        }
+
+
         //Update asteroids
         ArrayList<Asteroid> asteroidsToRemove = new ArrayList<>();
         for (Asteroid asteroid : asteroids){
@@ -282,6 +299,17 @@ public class  MainGameScreen implements Screen {
         }
         explosions.removeAll(explosionsToRemove);
 
+
+        //Update Reverse
+        ArrayList<Reverse> reversesToRemove = new ArrayList<>();
+        for (Reverse reverse : reverses){
+            reverse.update(delta);
+            if(reverse.remove){
+                reversesToRemove.add(reverse);
+            }
+        }
+
+        reverses.removeAll(reversesToRemove);
 
 
         //movement code
@@ -443,6 +471,20 @@ public class  MainGameScreen implements Screen {
         }
         heals.removeAll(healsToRemove);
 
+        for(Reverse reverse : reverses) {
+            if (reverse.getCollisionReact().collidesWith(playerReact)) {
+                reversesToRemove.add(reverse);
+                reverseMalus = true;
+                waitReverseCounter = 0;
+            }
+        }
+        waitReverseCounter += Gdx.graphics.getDeltaTime();
+        if(waitReverseCounter >= REVERSE_WAIT_TIME){
+           waitReverseCounter = 0;
+           reverseMalus = false;
+        }
+        reverses.removeAll(reversesToRemove);
+
         stateTime += delta;
 
         // il rendering funziona a layer, quindi l'ultima cosa che verrà reinderizzata sarà sopra le altre
@@ -466,6 +508,14 @@ public class  MainGameScreen implements Screen {
 
         for (Heal heal : heals){
             heal.render(game.batch);
+        }
+
+        for (Heal heal : heals){
+            heal.render(game.batch);
+        }
+
+        for (Reverse reverse : reverses){
+            reverse.render(game.batch);
         }
 
 
@@ -515,13 +565,22 @@ public class  MainGameScreen implements Screen {
      */
 
     private boolean isRight(){
-        // System.out.println("X:" + game.cam.getInputInGameWorld().x);
-        return Gdx.input.isKeyPressed(Input.Keys.RIGHT) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().x >= (float) SpaceGame.WIDTH /2);
+        if(reverseMalus){
+            return Gdx.input.isKeyPressed(Input.Keys.LEFT) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().x < (float) SpaceGame.WIDTH /2);
+        }
+        else{
+            return Gdx.input.isKeyPressed(Input.Keys.RIGHT) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().x >= (float) SpaceGame.WIDTH / 2);
+        }
 
     }
 
     private boolean isLeft(){
-        return Gdx.input.isKeyPressed(Input.Keys.LEFT) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().x < (float) SpaceGame.WIDTH /2);
+        if(reverseMalus) {
+            return Gdx.input.isKeyPressed(Input.Keys.RIGHT) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().x >= (float) SpaceGame.WIDTH / 2);
+        }
+        else{
+            return Gdx.input.isKeyPressed(Input.Keys.LEFT) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().x < (float) SpaceGame.WIDTH /2);
+        }
 
     }
 
@@ -541,7 +600,6 @@ public class  MainGameScreen implements Screen {
      Sono presenti le funzioni di stampa dei valori X e Y per vedere la posizione in base al puntatore del mouse
      */
     private boolean isUp(){
-        //System.out.println("Y:" + game.cam.getInputInGameWorld().y);
         return Gdx.input.isKeyPressed(Input.Keys.UP) || (Gdx.input.isTouched() && game.cam.getInputInGameWorld().y < (float) SpaceGame.HEIGHT /2);
 
     }
@@ -571,6 +629,11 @@ public class  MainGameScreen implements Screen {
 
     }
 
+
+    /*
+    Utilizziamo il metodo dispose per disfarci degli oggetti presenti, in modo da non creare dei doppioni ed avere memory leak, dovuti
+    a più schermate create durante un'unica sessione.
+     */
     @Override
     public void dispose() {
     shoot.dispose();

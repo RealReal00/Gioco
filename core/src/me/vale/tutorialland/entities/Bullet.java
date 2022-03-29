@@ -30,11 +30,11 @@ public class Bullet {
     }
 
     public void update(float deltaTime) {
-        y += SPEED * deltaTime;
+        y += SPEED * deltaTime; //spostamento asteroide
         if (y > SpaceGame.HEIGHT) {
             remove = true;
         }
-        react.move(x,y); //aggiorniamo la posizione del bullet per verificare le collisioni
+        react.move(x,y); //aggiorniamo la posizione del asteroide per verificare le collisioni
     }
 
     public void render(SpriteBatch batch) {

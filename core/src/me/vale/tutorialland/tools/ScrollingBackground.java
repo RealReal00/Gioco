@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import me.vale.tutorialland.screen.MainGameScreen;
 import me.vale.tutorialland.spacegame.SpaceGame;
 
-import java.awt.*;
-
 public class ScrollingBackground {
 
     public static final int DEFAULT_SPEED = 80;
@@ -19,7 +17,6 @@ public class ScrollingBackground {
     int goalSpeed; //velocità massima di movimento da raggiungere
     float imageScale;
     boolean speedFixed;
-    public boolean screenChange = false;
 
     public ScrollingBackground() {
 
@@ -29,7 +26,7 @@ public class ScrollingBackground {
         y2 = image.getHeight() - 150;
         speed = 0;
         goalSpeed = DEFAULT_SPEED;
-        imageScale = (float) SpaceGame.WIDTH / image.getWidth();
+        imageScale = (float) SpaceGame.WIDTH / image.getWidth(); //serve per mantenere in proporzione la schermata di gioco
         speedFixed = true;
     }
 

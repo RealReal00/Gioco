@@ -13,6 +13,12 @@ import me.vale.tutorialland.tools.ScrollingBackground;
 	che risultano molto utili. (ApplicationAdapter fa riferimento ad un app generica).
  */
 
+/*
+SpaceGame estende la classe Game che a sua volta implementa l'interfaccia Application Listener
+che contiene il metodo create che viene chiamato quando l'applicazione viene creata.
+
+
+ */
 public class SpaceGame extends Game {
 
 	public static final int WIDTH = 480;
@@ -57,7 +63,7 @@ public class SpaceGame extends Game {
 	e "batch.end" invece dice che può fermarsi.
 	"batch.draw" si utilizza per impostare l'immagine da disegnare nel nostro caso "img" che corrisponde ad un
 	oggetto Texture. i valori x:0 e y:0 indicano le coordinate alle quali l'immagine deve essere disegnata,
-	di default le coordinate 0,0 indicano l'angolo in basso a sinistra.
+	di default le coordinate 0,0 indicano l'angolo in alto a sinistra.
 
 	Gdx.input.isKeyPressed: restituisce se il tasto è stato premuto.
 	Gdx.input.isKeyJustPressed: restituisce se il tasto è stato appena premuto.
@@ -69,7 +75,7 @@ public class SpaceGame extends Game {
 	andare in più direzioni (consentito il movimento diagonale).
 
 
-	Delta time = 1/fps (1/60) tempo tra un fps e l'altro. Più è alto maggiore sarà la fluidità e la velocità.
+	Delta time = 1/fps (1/60) tempo tra un fps e l'altro. Più è alto, maggiore sarà la fluidità e la velocità.
 	Chiamiamo "super.render" perchè sappiamo che andrà in loop
  */
 
@@ -79,14 +85,12 @@ public class SpaceGame extends Game {
 		/* stiamo dicendo al batch che questa è la nostra camera e con .combined passiamo le matrici del nostro schermo
 		 e questo è come vogliamo che venga gestito, ovvero stretciato in base alla dimensione dello schermo. manteniamo il rapporto. */
 		batch.setProjectionMatrix(cam.combined());
-		super.render();
+		super.render(); //utilizziamo super. perchè ci stiamo riferendo ad un metodo della classe genitore
 	}
 
 	public void resize(int width, int height) {
 			cam.update(width,height); //IN QUESTO MODO QUALSIASI SIA IL RAPPORTO DELLO SCHERMO LO ANDIAMO A RIDIMENSIONARE
 			super.resize(width,height);
-
-
 	}
 }
 

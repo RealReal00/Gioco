@@ -45,7 +45,7 @@ public class MainMenuScreen implements Screen {
         Gdx.input.setInputProcessor(new InputAdapter() {
 
             /*
-            Usiamo touchDown per rilevare dove viene lasciata la pressione sullo schermo non per quando avviene
+            Usiamo touchDown per rilevare dove viene rilasciata la pressione sullo schermo (non per quando avviene)
              */
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
@@ -59,7 +59,7 @@ public class MainMenuScreen implements Screen {
                 //Play button
                 x = SpaceGame.WIDTH / 2 - PLAY_BUTTON_WIDTH /2;
                 if (game.cam.getInputInGameWorld().x < x + PLAY_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < PLAY_BUTTON_Y + PLAY_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > PLAY_BUTTON_Y) {
-                    mainMenuScreen.dispose();
+                    mainMenuScreen.dispose(); //per non
                     game.setScreen(new MainGameScreen(game));
                 }
                     return super.touchUp(screenX, screenY, pointer, button);
@@ -75,6 +75,10 @@ public class MainMenuScreen implements Screen {
 
     }
 
+    /*
+    Utilizziamo game.batch.begin() per settare gli stati del render ed una volta finito il setup degli stati
+    tramite game.batch.end() verrà eseguito il "draw" su schermo (ovvero viene eseguito il rendering 2D).
+     */
     @Override
     public void render(float delta) {
 
