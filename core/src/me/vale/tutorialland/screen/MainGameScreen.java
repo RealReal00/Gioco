@@ -117,7 +117,7 @@ public class  MainGameScreen implements Screen {
             controls = new Texture("controls.png");
         }
 
-        score = 1000;
+        score = 0;
         /*
         Random.nextfloat() genera un numero random compreso tra 0 e 1
         in pratica quello che facciamo e fare un calcolo random + aggiungiamo 0.3s al risultato in modo da avere uno spawn

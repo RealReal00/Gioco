@@ -96,6 +96,7 @@ public class GameOverScreen implements Screen {
             if(touchX > tryAgainX && touchX < tryAgainX + tryAgainLayout.width && touchY > tryAgainY - tryAgainLayout.height && touchY < tryAgainY){
                 this.dispose();
                 game.batch.end();
+                ScrollingBackground.image = new Texture("spaceBackgrondMoon.jpg");
                 game.setScreen(new MainGameScreen(game));
                 return;
             }
@@ -104,7 +105,6 @@ public class GameOverScreen implements Screen {
                 this.dispose();
                 game.batch.end();
                 game.setScreen(new MainMenuScreen(game));
-
                 return;
             }
         }

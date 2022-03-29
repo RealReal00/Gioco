@@ -83,6 +83,7 @@ public class MainMenuScreen implements Screen {
         game.batch.begin();
 
         game.ScrollingBackground.updateAndRender(delta,game.batch);
+        ScrollingBackground.image = new Texture("spaceBackgrondMoon.jpg");
 
         int x = SpaceGame.WIDTH / 2 - EXIT_BUTTON_WIDTH /2;
         if (game.cam.getInputInGameWorld().x < x + EXIT_BUTTON_WIDTH && game.cam.getInputInGameWorld().x > x && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y < EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT && SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y > EXIT_BUTTON_Y){
