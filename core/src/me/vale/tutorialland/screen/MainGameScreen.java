@@ -46,7 +46,7 @@ public class  MainGameScreen implements Screen {
     public static final float MAX_ASTEROID_SPAWN_TIME = 0.6f; //max tempo di spawn di un asteroide
 
     //HEAL
-    public static final float MIN_HEAL_SPAWN_TIME = 6.5f; //minimo di tempo di spawn tra un asteroide e l'altro
+    public static final float MIN_HEAL_SPAWN_TIME = 8.5f; //minimo di tempo di spawn tra un asteroide e l'altro
     public static final float MAX_HEAL_SPAWN_TIME = 10.5f; //max tempo di spawn di un asteroide
 
     public static final float WAIT_COMMAND = 2;
