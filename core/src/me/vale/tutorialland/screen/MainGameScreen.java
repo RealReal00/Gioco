@@ -637,6 +637,7 @@ public class  MainGameScreen implements Screen {
         }
         else if(health > 0.2f){
             game.batch.setColor(Color.YELLOW);
+            onceLowHp = false;
         }
         else{
             game.batch.setColor(Color.RED);
