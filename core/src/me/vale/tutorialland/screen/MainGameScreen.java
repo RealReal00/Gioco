@@ -57,8 +57,8 @@ public class  MainGameScreen implements Screen {
     public static final int PLAYERSHIELD_WIDTH = 150;
     public static final int PLAYERSHIELD_HEIGHT = 150;
 
-    public static final int PAUSEBUTTON_WIDTH = 30;
-    public static final int PAUSEBUTTON_HEIGHT = 30;
+    //public static final int PAUSEBUTTON_WIDTH = 30;
+    //public static final int PAUSEBUTTON_HEIGHT = 30;
 
     public static final float WAIT_COMMAND = 2;
 
@@ -88,15 +88,15 @@ public class  MainGameScreen implements Screen {
     float reverseSpawnTimer;
     float shieldSpawnTimer;
 
-    float pauseButtonX;
-    float pauseButtonY;
+    //float pauseButtonX;
+    //float pauseButtonY;
     float countSleepTime;
     Random random;
 
     public boolean reverseMalus = false;
     public boolean shieldBonus = false;
     public boolean onceLowHp = false;
-    public boolean pause = false;
+   // public boolean pause = false;
 
     float shootTimer;
     SpaceGame game;
@@ -109,7 +109,7 @@ public class  MainGameScreen implements Screen {
 
     Texture blank;
     Texture controls;
-    Texture pauseButton;
+    //Texture pauseButton;
 
     BitmapFont scoreFont;
 
@@ -142,10 +142,10 @@ public class  MainGameScreen implements Screen {
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
         shieldReact = new CollisionReact(0,0,PLAYERSHIELD_WIDTH, PLAYERSHIELD_HEIGHT);
         blank = new Texture("blank.png");
-        pauseButton = new Texture("pauseButton.png");
+       // pauseButton = new Texture("pauseButton.png");
 
-        pauseButtonX = (float) PAUSEBUTTON_WIDTH /2;
-        pauseButtonY = (float) PAUSEBUTTON_HEIGHT / 2;
+        //pauseButtonX = 0;
+        //pauseButtonY = 0;
 
 
         //BUTTON
@@ -209,24 +209,30 @@ public class  MainGameScreen implements Screen {
         music.setVolume(0.1f);
         music.play();
 
+        /*
         countSleepTime += Gdx.graphics.getDeltaTime();
 
         float touchX = game.cam.getInputInGameWorld().x, touchY = SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y;
 
-        if(touchX > pauseButtonX && touchX < pauseButtonX + PAUSEBUTTON_WIDTH && touchY > pauseButtonY - PAUSEBUTTON_HEIGHT && touchY < pauseButtonY){
+        if(touchX > pauseButtonX && touchX < pauseButtonX + PAUSEBUTTON_WIDTH && touchY < Gdx.graphics.getHeight() && touchY > Gdx.graphics.getHeight() - PAUSEBUTTON_HEIGHT){
             pause = true;
+        } else {
+            pause = false;
         }
 
 
 
 
-    if(pause) {
+        if(pause) {
         try {
-            Thread.sleep(5000);
+            Thread.holdsLock()
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
+    */
+
 
         //shooting code
         shootTimer += delta;
@@ -632,7 +638,7 @@ public class  MainGameScreen implements Screen {
 
         game.ScrollingBackground.updateAndRender(delta, game.batch);
 
-        game.batch.draw(pauseButton,pauseButtonX,Gdx.graphics.getHeight() - 50);
+       // game.batch.draw(pauseButton,pauseButtonX,Gdx.graphics.getHeight()-PAUSEBUTTON_HEIGHT);
 
         for (Bullet bullet : bullets) {
             bullet.render(game.batch);
