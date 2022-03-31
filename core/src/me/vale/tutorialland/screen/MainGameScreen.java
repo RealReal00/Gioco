@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.entities.*;
 
@@ -46,22 +45,34 @@ public class  MainGameScreen implements Screen {
     public static final float MAX_HEAL_SPAWN_TIME = 10.5f; //max tempo di spawn di un asteroide
 
     //REVERSE
-    public static final float MIN_REVERSE_SPAWN_TIME = 1f; //minimo di tempo di spawn tra un reverse e l'altro
-    public static final float MAX_REVERSE_SPAWN_TIME = 3f; //max tempo di spawn di un reverse
+    public static final float MIN_REVERSE_SPAWN_TIME = 7f; //minimo di tempo di spawn tra un reverse e l'altro
+    public static final float MAX_REVERSE_SPAWN_TIME = 12f; //max tempo di spawn di un reverse
     public static final float REVERSE_WAIT_TIME = 15;
 
+    //Shield
+    public static final float MIN_SHIELD_SPAWN_TIME = 15f; //minimo di tempo di spawn tra uno shield e l'altro
+    public static final float MAX_SHIELD_SPAWN_TIME = 20.5f; //max tempo di spawn di un shield
+    public static final float SHIELD_WAIT_TIME = 6.5f;
+
+    public static final int PLAYERSHIELD_WIDTH = 150;
+    public static final int PLAYERSHIELD_HEIGHT = 150;
+
     public static final float WAIT_COMMAND = 2;
+
+
 
     //Sound & Music
     private final Music music = Gdx.audio.newMusic(Gdx.files.internal("8 Bit Universe.mp3"));
     private final Sound shoot = Gdx.audio.newSound(Gdx.files.internal("shootSound.mp3"));
-    private final Sound healFx = Gdx.audio.newSound(Gdx.files.internal("Heal Sound Effect.mp3"));
+    private final Sound healFx = Gdx.audio.newSound(Gdx.files.internal("restoreHP.mp3"));
     private final Sound explosionFx = Gdx.audio.newSound(Gdx.files.internal("Explosion Sound Effect.mp3"));
     private final Sound hitFx = Gdx.audio.newSound(Gdx.files.internal("8-Bit Hit Sound Effect.mp3"));
+    private final Sound lowHp = Gdx.audio.newSound(Gdx.files.internal("lowHp.mp3"));
 
     Animation[]rolls;
     private float waitCommandCounter = 0;
     private float waitReverseCounter = 0;
+    private float waitShieldCounter = 0;
 
     float x;
     float y;
@@ -72,10 +83,13 @@ public class  MainGameScreen implements Screen {
     float asteroidsSpawnTimer;
     float healsSpawnTimer;
     float reverseSpawnTimer;
+    float shieldSpawnTimer;
 
     Random random;
 
     public boolean reverseMalus = false;
+    public boolean shieldBonus = false;
+    public boolean onceLowHp = false;
 
     float shootTimer;
     SpaceGame game;
@@ -84,6 +98,7 @@ public class  MainGameScreen implements Screen {
     ArrayList<Explosion> explosions;
     ArrayList<Heal> heals;
     ArrayList<Reverse> reverses;
+    ArrayList<Shield> shields;
 
     Texture blank;
     Texture controls;
@@ -91,7 +106,7 @@ public class  MainGameScreen implements Screen {
     BitmapFont scoreFont;
 
     CollisionReact playerReact;
-
+    CollisionReact shieldReact;
     float health = 1; //0 = dead, 1 = full health
     public static int score;
 
@@ -112,11 +127,15 @@ public class  MainGameScreen implements Screen {
         explosions = new ArrayList<>();
         reverses = new ArrayList<>();
         heals = new ArrayList<>();
+        shields = new ArrayList<>();
         scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
+        shieldReact = new CollisionReact(0,0,PLAYERSHIELD_WIDTH, PLAYERSHIELD_HEIGHT);
         blank = new Texture("blank.png");
 
-        new PointLight();
+        //BUTTON
+
+
         
         //MUSIC & SOUNDFX
 
@@ -134,7 +153,7 @@ public class  MainGameScreen implements Screen {
         asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
         healsSpawnTimer = random.nextFloat() * (MAX_HEAL_SPAWN_TIME - MIN_HEAL_SPAWN_TIME) + MIN_HEAL_SPAWN_TIME;
         reverseSpawnTimer = random.nextFloat() * (MAX_REVERSE_SPAWN_TIME - MIN_REVERSE_SPAWN_TIME) + MIN_REVERSE_SPAWN_TIME;
-
+        shieldSpawnTimer = random.nextFloat() * (MAX_SHIELD_SPAWN_TIME - MIN_SHIELD_SPAWN_TIME) + MIN_SHIELD_SPAWN_TIME;
 
         shootTimer = 0;
 
@@ -191,16 +210,16 @@ public class  MainGameScreen implements Screen {
             }
 
             long id = shoot.play();
-            shoot.setVolume(id,0.2f);
+            shoot.setVolume(id, 0.2f);
 
             bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH / 2, y + 40));
 
-            if(score > 1000){
+            if (score > 1000) {
                 bullets.add(new Bullet(x + offset, y + 40));
                 bullets.add(new Bullet(x + SHIP_WIDTH - offset, y + 40));
             }
 
-            if(score > 2500){
+            if (score > 2500) {
                 bullets.add(new Bullet(x + offset + 10, y + 40));
                 bullets.add(new Bullet(x + SHIP_WIDTH - offset - 10, y + 40));
             }
@@ -208,8 +227,6 @@ public class  MainGameScreen implements Screen {
 
         if (shootTimer >= SHOOT_WAIT_TIME && !SpaceGame.IS_MOBILE && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             shootTimer = 0;
-
-
 
             int offset = 4;
 
@@ -222,16 +239,16 @@ public class  MainGameScreen implements Screen {
             }
 
             long id = shoot.play();
-            shoot.setVolume(id,0.2f);
+            shoot.setVolume(id, 0.2f);
 
             bullets.add(new Bullet(x + SHIP_WIDTH - (float) SHIP_WIDTH / 2, y + 40));
 
-            if(score > 1000){
+            if (score > 1000) {
                 bullets.add(new Bullet(x + offset, y + 40));
                 bullets.add(new Bullet(x + SHIP_WIDTH - offset, y + 40));
             }
 
-            if(score > 2500){
+            if (score > 2500) {
                 bullets.add(new Bullet(x + offset + 10, y + 40));
                 bullets.add(new Bullet(x + SHIP_WIDTH - offset - 10, y + 40));
             }
@@ -240,31 +257,41 @@ public class  MainGameScreen implements Screen {
         //Asteroids Spawn Code
         //SpaceGame.WIDTH - Asteroid.WIDTH <- per evitare asteroidi tagliati sul bordo destro dello schermo
         asteroidsSpawnTimer -= delta;
-        if(asteroidsSpawnTimer <= 0){
+        if (asteroidsSpawnTimer <= 0) {
             asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
             asteroids.add(new Asteroid(random.nextInt(SpaceGame.WIDTH - Asteroid.WIDTH)));
         }
 
         //heal spawn code
         healsSpawnTimer -= delta;
-        if(healsSpawnTimer <= 0){
+        if (healsSpawnTimer <= 0) {
             healsSpawnTimer = random.nextFloat() * (MAX_HEAL_SPAWN_TIME - MIN_HEAL_SPAWN_TIME) + MIN_HEAL_SPAWN_TIME;
             heals.add(new Heal(random.nextInt(SpaceGame.WIDTH - Heal.WIDTH)));
         }
 
         //reverse spawn code
         reverseSpawnTimer -= delta;
-        if(reverseSpawnTimer <= 0){
-            reverseSpawnTimer = random.nextFloat() *(MAX_REVERSE_SPAWN_TIME - MIN_REVERSE_SPAWN_TIME) + MIN_REVERSE_SPAWN_TIME;
+        if (reverseSpawnTimer <= 0) {
+            reverseSpawnTimer = random.nextFloat() * (MAX_REVERSE_SPAWN_TIME - MIN_REVERSE_SPAWN_TIME) + MIN_REVERSE_SPAWN_TIME;
             reverses.add(new Reverse(random.nextInt(SpaceGame.WIDTH - Reverse.WIDTH)));
         }
+
+        //shield spawn code
+        shieldSpawnTimer -= delta;
+        if (shieldSpawnTimer <= 0 && !shieldBonus) {
+            shieldSpawnTimer = random.nextFloat() * (MAX_SHIELD_SPAWN_TIME - MIN_SHIELD_SPAWN_TIME) + MIN_SHIELD_SPAWN_TIME;
+            shields.add(new Shield(random.nextInt(SpaceGame.WIDTH - Shield.WIDTH), SpaceGame.HEIGHT));
+        }
+
+        //PlayerShield
+        PlayerShield playerShield = new PlayerShield(x - (float) PlayerShield.WIDTH / 2 - PlayerShield.WIDTH , y + 30);
 
 
         //Update asteroids
         ArrayList<Asteroid> asteroidsToRemove = new ArrayList<>();
-        for (Asteroid asteroid : asteroids){
+        for (Asteroid asteroid : asteroids) {
             asteroid.update(delta);
-            if(asteroid.remove){
+            if (asteroid.remove) {
                 asteroidsToRemove.add(asteroid);
             }
         }
@@ -281,9 +308,9 @@ public class  MainGameScreen implements Screen {
 
         //update heal
         ArrayList<Heal> healsToRemove = new ArrayList<>();
-        for (Heal heal : heals){
+        for (Heal heal : heals) {
             heal.update(delta);
-            if(heal.remove){
+            if (heal.remove) {
                 healsToRemove.add(heal);
             }
         }
@@ -291,9 +318,9 @@ public class  MainGameScreen implements Screen {
 
         //update explosions
         ArrayList<Explosion> explosionsToRemove = new ArrayList<>();
-        for(Explosion explosion : explosions){
+        for (Explosion explosion : explosions) {
             explosion.update(delta);
-            if(explosion.remove){
+            if (explosion.remove) {
                 explosionsToRemove.add(explosion);
             }
         }
@@ -302,10 +329,19 @@ public class  MainGameScreen implements Screen {
 
         //Update Reverse
         ArrayList<Reverse> reversesToRemove = new ArrayList<>();
-        for (Reverse reverse : reverses){
+        for (Reverse reverse : reverses) {
             reverse.update(delta);
-            if(reverse.remove){
+            if (reverse.remove) {
                 reversesToRemove.add(reverse);
+            }
+        }
+
+        //update shield
+        ArrayList<Shield> shieldsToRemove = new ArrayList<>();
+        for (Shield shield : shields) {
+            shield.update(delta);
+            if (shield.remove) {
+                shieldsToRemove.add(shield);
             }
         }
 
@@ -314,8 +350,7 @@ public class  MainGameScreen implements Screen {
 
         //movement code
 
-
-        if (isUp()){
+        if (isUp()) {
             y += SPEED * Gdx.graphics.getDeltaTime();
 
             //bordo superiore
@@ -386,8 +421,8 @@ public class  MainGameScreen implements Screen {
             //aggiorniamo la virata a sinistra se siamo ancora in virata verso destra (movimento più fluido e naturale)
             if (isJustRight() && !isLeft() && roll > 0) {
                 rollTimer = 0;
-                if(roll < 4){
-                roll++;
+                if (roll < 4) {
+                    roll++;
                 }
             }
 
@@ -399,9 +434,8 @@ public class  MainGameScreen implements Screen {
             }
             /*
             se roll è < 2 stiamo ancora virando verso sinistra.
-             */
-        }
-        else {
+            */
+        } else {
             if (roll > 2) {
                 rollTimer -= Gdx.graphics.getDeltaTime();
                 if (Math.abs(rollTimer) > ROLL_TIMER_SWITCH_TIME && roll > 0) {
@@ -412,8 +446,11 @@ public class  MainGameScreen implements Screen {
         }
 
 
-        // dopo aver mosso la navicella, aggiorniamo le collisioni (collisionReact)
+        // dopo aver mosso la navicella, aggiorniamo le collisioni (collisionReact),
+        // stessa cosa per lo scudo nel caso sia attivo il power up
         playerReact.move(x,y);
+        if(shieldBonus)
+        shieldReact.move(x -(float) PLAYERSHIELD_WIDTH / 3 + 10, y);
 
 
 
@@ -421,12 +458,12 @@ public class  MainGameScreen implements Screen {
            Eseguiamo un loop innestato, in modo che controlliamo se un proiettile ha una collisione con un
            qualsiasi proiettile presente nello schermo di gioco.
          */
-        for(Bullet bullet : bullets){
-            for (Asteroid asteroid : asteroids){
-                if(bullet.getCollisionReact().collidesWith(asteroid.getCollisionReact())){ //avviene una collisione
+        for (Bullet bullet : bullets) {
+            for (Asteroid asteroid : asteroids) {
+                if (bullet.getCollisionReact().collidesWith(asteroid.getCollisionReact())) { //avviene una collisione
                     bulletsToRemove.add(bullet);
                     asteroidsToRemove.add(asteroid);
-                    explosions.add(new Explosion(asteroid.getX(),asteroid.getY()));
+                    explosions.add(new Explosion(asteroid.getX(), asteroid.getY()));
                     score += 100;
                     long idExplosion = explosionFx.play();
                     explosionFx.setVolume(idExplosion, 0.3f);
@@ -436,56 +473,123 @@ public class  MainGameScreen implements Screen {
         asteroids.removeAll(asteroidsToRemove); //rimuoviamo tutti gli asteroidi presenti nell' ArrayList da rimuovere
         bullets.removeAll(bulletsToRemove); //rimuoviamo tutti i proiettili presenti nell' ArrayList da rimuovere
 
-        for (Asteroid asteroid : asteroids){
-            if(asteroid.getCollisionReact().collidesWith(playerReact)){
-                asteroidsToRemove.add(asteroid);
-                health -= 0.1;
-                hitFx.play();
+        if (!shieldBonus) {
+            for (Asteroid asteroid : asteroids) {
+                if (asteroid.getCollisionReact().collidesWith(playerReact)) {
+                    asteroidsToRemove.add(asteroid);
+                    if (!shieldBonus) {
+                        health -= 0.1;
+                        hitFx.play();
+                    }
 
-                //if health is depleted go to game over screen
-                if(health <= 0){
-                    this.dispose(); //causes the JFrame window to be destroyed and cleaned up by the operating system
-                    game.setScreen(new GameOverScreen(game, score));
-                    return;
+                    //if health is depleted go to game over screen
+                    if (health <= 0) {
+                        this.dispose(); //causes the JFrame window to be destroyed and cleaned up by the operating system
+                        game.setScreen(new GameOverScreen(game, score));
+                        return;
+                    }
                 }
             }
-        }
-
-        asteroids.removeAll(asteroidsToRemove);
+            asteroids.removeAll(asteroidsToRemove);
 
 
-        for(Heal heal : heals) {
-            if (heal.getCollisionReact().collidesWith(playerReact)) {
-                healsToRemove.add(heal);
+            for (Heal heal : heals) {
+                if (heal.getCollisionReact().collidesWith(playerReact)) {
+                    healsToRemove.add(heal);
 
-                if(health <= 0.8)
-                health += 0.2;
+                    if (health <= 0.8)
+                        health += 0.2;
 
-                if(health == 0.9 )
-                    health = 1;
+                    if (health == 0.9)
+                        health = 1;
 
-                long idHeal = healFx.play();
-                healFx.setVolume(idHeal,1f);
+                    long idHeal = healFx.play();
+                    healFx.setVolume(idHeal, 1f);
+                }
+
+            }
+            heals.removeAll(healsToRemove);
+
+
+            for (Reverse reverse : reverses) {
+                if (reverse.getCollisionReact().collidesWith(playerReact)) {
+                    reversesToRemove.add(reverse);
+                    if (!shieldBonus) {
+                        reverseMalus = true;
+                    }
+                    waitReverseCounter = 0;
+                }
             }
 
-        }
-        heals.removeAll(healsToRemove);
+            reverses.removeAll(reversesToRemove);
 
-        for(Reverse reverse : reverses) {
-            if (reverse.getCollisionReact().collidesWith(playerReact)) {
-                reversesToRemove.add(reverse);
-                reverseMalus = true;
-                waitReverseCounter = 0;
+
+            //Shield
+
+            for (Shield shield : shields) {
+                if (shield.getCollisionReact().collidesWith(playerReact)) {
+                    shieldsToRemove.add(shield);
+                    shieldBonus = true;
+                    waitShieldCounter = 0;
+                }
             }
+            shields.removeAll(shieldsToRemove);
         }
+
         waitReverseCounter += Gdx.graphics.getDeltaTime();
-        if(waitReverseCounter >= REVERSE_WAIT_TIME){
-           waitReverseCounter = 0;
-           reverseMalus = false;
+        if (waitReverseCounter >= REVERSE_WAIT_TIME) {
+            waitReverseCounter = 0;
+            reverseMalus = false;
         }
-        reverses.removeAll(reversesToRemove);
+
+        waitShieldCounter += Gdx.graphics.getDeltaTime();
+        if(waitShieldCounter >= SHIELD_WAIT_TIME){
+            waitShieldCounter = 0;
+            shieldBonus = false;
+        }
+
+
+        //rimuoviamo qualsiasi cosa collida sul playerShield
+        if(shieldBonus) {
+            for (Asteroid asteroid : asteroids) {
+                if (asteroid.getCollisionReact().collidesWith(shieldReact)) { //avviene una collisione
+                    asteroidsToRemove.add(asteroid);
+                    explosions.add(new Explosion(asteroid.getX(), asteroid.getY()));
+                    score += 25;
+                    long idExplosion = explosionFx.play();
+                    explosionFx.setVolume(idExplosion, 0.3f);
+                }
+            }
+            asteroids.removeAll(asteroidsToRemove);
+
+
+            for (Reverse reverse : reverses) {
+                if (reverse.getCollisionReact().collidesWith(shieldReact)) { //avviene una collisione
+                    reversesToRemove.add(reverse);
+                    score += 15;
+                }
+            }
+            reverses.removeAll(reversesToRemove);
+
+            for (Heal heal : heals) {
+                if (heal.getCollisionReact().collidesWith(shieldReact)) { //avviene una collisione
+                    healsToRemove.add(heal);
+                    if (health <= 0.8)
+                        health += 0.2;
+
+                    if (health == 0.9)
+                        health = 1;
+
+                    long idHeal = healFx.play();
+                    healFx.setVolume(idHeal, 1f);
+                }
+            }
+            heals.removeAll(healsToRemove);
+        }
+
 
         stateTime += delta;
+
 
         // il rendering funziona a layer, quindi l'ultima cosa che verrà reinderizzata sarà sopra le altre
         ScreenUtils.clear(0, 0, 0, 1);
@@ -518,7 +622,14 @@ public class  MainGameScreen implements Screen {
             reverse.render(game.batch);
         }
 
+        for (Shield shield : shields){
+            shield.render(game.batch);
+        }
 
+
+        if(shieldBonus){
+            playerShield.render(game.batch);
+        }
 
 
         if(health > 0.6f){
@@ -529,6 +640,10 @@ public class  MainGameScreen implements Screen {
         }
         else{
             game.batch.setColor(Color.RED);
+            if(!onceLowHp) {
+                lowHp.play();
+                onceLowHp = true;
+            }
         }
 
         game.batch.draw(blank,0,0, SpaceGame.WIDTH * health, 5);
@@ -641,5 +756,6 @@ public class  MainGameScreen implements Screen {
     healFx.dispose();
     explosionFx.dispose();
     hitFx.dispose();
+    lowHp.dispose();
     }
 }
