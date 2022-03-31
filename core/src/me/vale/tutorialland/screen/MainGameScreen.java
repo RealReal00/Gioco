@@ -57,6 +57,9 @@ public class  MainGameScreen implements Screen {
     public static final int PLAYERSHIELD_WIDTH = 150;
     public static final int PLAYERSHIELD_HEIGHT = 150;
 
+    public static final int PAUSEBUTTON_WIDTH = 30;
+    public static final int PAUSEBUTTON_HEIGHT = 30;
+
     public static final float WAIT_COMMAND = 2;
 
 
@@ -85,11 +88,15 @@ public class  MainGameScreen implements Screen {
     float reverseSpawnTimer;
     float shieldSpawnTimer;
 
+    float pauseButtonX;
+    float pauseButtonY;
+    float countSleepTime;
     Random random;
 
     public boolean reverseMalus = false;
     public boolean shieldBonus = false;
     public boolean onceLowHp = false;
+    public boolean pause = false;
 
     float shootTimer;
     SpaceGame game;
@@ -102,6 +109,7 @@ public class  MainGameScreen implements Screen {
 
     Texture blank;
     Texture controls;
+    Texture pauseButton;
 
     BitmapFont scoreFont;
 
@@ -109,6 +117,8 @@ public class  MainGameScreen implements Screen {
     CollisionReact shieldReact;
     float health = 1; //0 = dead, 1 = full health
     public static int score;
+
+    //touch ci prende le coordinate di dove avviene la pressione sullo schermo.
 
     /* Quando creiamo il costruttore di MainGameScreen, passiamo "SpaceGame Game" cosi dentro questa classe siamo in
     grado di accedere alla classe principale "SpaceGame". In questo modo accediamo al batch (dobbiamo definirlo public),
@@ -132,6 +142,11 @@ public class  MainGameScreen implements Screen {
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
         shieldReact = new CollisionReact(0,0,PLAYERSHIELD_WIDTH, PLAYERSHIELD_HEIGHT);
         blank = new Texture("blank.png");
+        pauseButton = new Texture("pauseButton.png");
+
+        pauseButtonX = (float) PAUSEBUTTON_WIDTH /2;
+        pauseButtonY = (float) PAUSEBUTTON_HEIGHT / 2;
+
 
         //BUTTON
 
@@ -193,6 +208,25 @@ public class  MainGameScreen implements Screen {
 
         music.setVolume(0.1f);
         music.play();
+
+        countSleepTime += Gdx.graphics.getDeltaTime();
+
+        float touchX = game.cam.getInputInGameWorld().x, touchY = SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y;
+
+        if(touchX > pauseButtonX && touchX < pauseButtonX + PAUSEBUTTON_WIDTH && touchY > pauseButtonY - PAUSEBUTTON_HEIGHT && touchY < pauseButtonY){
+            pause = true;
+        }
+
+
+
+
+    if(pause) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
         //shooting code
         shootTimer += delta;
@@ -284,7 +318,7 @@ public class  MainGameScreen implements Screen {
         }
 
         //PlayerShield
-        PlayerShield playerShield = new PlayerShield(x - (float) PlayerShield.WIDTH / 2 - PlayerShield.WIDTH , y + 30);
+        PlayerShield playerShield = new PlayerShield(x - (float) PlayerShield.WIDTH / 2 - PlayerShield.WIDTH, y + 30);
 
 
         //Update asteroids
@@ -448,9 +482,9 @@ public class  MainGameScreen implements Screen {
 
         // dopo aver mosso la navicella, aggiorniamo le collisioni (collisionReact),
         // stessa cosa per lo scudo nel caso sia attivo il power up
-        playerReact.move(x,y);
-        if(shieldBonus)
-        shieldReact.move(x -(float) PLAYERSHIELD_WIDTH / 3 + 10, y);
+        playerReact.move(x, y);
+        if (shieldBonus)
+            shieldReact.move(x - (float) PLAYERSHIELD_WIDTH / 3 + 10, y);
 
 
 
@@ -543,14 +577,14 @@ public class  MainGameScreen implements Screen {
         }
 
         waitShieldCounter += Gdx.graphics.getDeltaTime();
-        if(waitShieldCounter >= SHIELD_WAIT_TIME){
+        if (waitShieldCounter >= SHIELD_WAIT_TIME) {
             waitShieldCounter = 0;
             shieldBonus = false;
         }
 
 
         //rimuoviamo qualsiasi cosa collida sul playerShield
-        if(shieldBonus) {
+        if (shieldBonus) {
             for (Asteroid asteroid : asteroids) {
                 if (asteroid.getCollisionReact().collidesWith(shieldReact)) { //avviene una collisione
                     asteroidsToRemove.add(asteroid);
@@ -596,82 +630,83 @@ public class  MainGameScreen implements Screen {
         game.batch.begin();
 
 
-        game.ScrollingBackground.updateAndRender(delta,game.batch);
+        game.ScrollingBackground.updateAndRender(delta, game.batch);
+
+        game.batch.draw(pauseButton,pauseButtonX,Gdx.graphics.getHeight() - 50);
 
         for (Bullet bullet : bullets) {
             bullet.render(game.batch);
         }
 
-        for (Asteroid asteroid : asteroids){
+        for (Asteroid asteroid : asteroids) {
             asteroid.render(game.batch);
         }
 
-        for (Explosion explosion : explosions){
-        explosion.render(game.batch);
+        for (Explosion explosion : explosions) {
+            explosion.render(game.batch);
         }
 
-        for (Heal heal : heals){
+        for (Heal heal : heals) {
             heal.render(game.batch);
         }
 
-        for (Heal heal : heals){
+        for (Heal heal : heals) {
             heal.render(game.batch);
         }
 
-        for (Reverse reverse : reverses){
+        for (Reverse reverse : reverses) {
             reverse.render(game.batch);
         }
 
-        for (Shield shield : shields){
+        for (Shield shield : shields) {
             shield.render(game.batch);
         }
 
 
-        if(shieldBonus){
+        if (shieldBonus) {
             playerShield.render(game.batch);
         }
 
         //color and soundFx of SpaceShip life
-        if(health > 0.6f){
+        if (health > 0.6f) {
             game.batch.setColor(Color.GREEN);
-        }
-        else if(health > 0.2f){
+        } else if (health > 0.2f) {
             game.batch.setColor(Color.YELLOW);
             onceLowHp = false;
-        }
-        else{
+        } else {
             game.batch.setColor(Color.RED);
-            if(!onceLowHp) {
+            if (!onceLowHp) {
                 lowHp.play();
                 onceLowHp = true;
             }
         }
 
-        game.batch.draw(blank,0,0, SpaceGame.WIDTH * health, 5);
+        game.batch.draw(blank, 0, 0, SpaceGame.WIDTH * health, 5);
         game.batch.setColor(Color.WHITE);
 
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
 
 
         GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "" + score);
-        scoreFont.draw(game.batch, scoreLayout, (float)SpaceGame.WIDTH / 2 - scoreLayout.width / 2, SpaceGame.HEIGHT - scoreLayout.height - 10);
+        scoreFont.draw(game.batch, scoreLayout, (float) SpaceGame.WIDTH / 2 - scoreLayout.width / 2, SpaceGame.HEIGHT - scoreLayout.height - 10);
 
-        if(SpaceGame.IS_MOBILE && waitCommandCounter < WAIT_COMMAND){
+        if (SpaceGame.IS_MOBILE && waitCommandCounter < WAIT_COMMAND) {
             //draw left side
             waitCommandCounter += delta;
             game.batch.setColor(Color.RED);
-            game.batch.draw(controls, 0 ,0, (float) SpaceGame.WIDTH/2, SpaceGame.HEIGHT, 0,0, SpaceGame.WIDTH /2, SpaceGame.HEIGHT ,false, false);
+            game.batch.draw(controls, 0, 0, (float) SpaceGame.WIDTH / 2, SpaceGame.HEIGHT, 0, 0, SpaceGame.WIDTH / 2, SpaceGame.HEIGHT, false, false);
 
             //draw right side
             game.batch.setColor(Color.BLUE);
-            game.batch.draw(controls, (float) SpaceGame.WIDTH/2 ,0, (float) SpaceGame.WIDTH/2,SpaceGame.HEIGHT, 0,0,SpaceGame.WIDTH /2, SpaceGame.HEIGHT,true, false);
+            game.batch.draw(controls, (float) SpaceGame.WIDTH / 2, 0, (float) SpaceGame.WIDTH / 2, SpaceGame.HEIGHT, 0, 0, SpaceGame.WIDTH / 2, SpaceGame.HEIGHT, true, false);
             game.batch.setColor(Color.WHITE);
         }
 
+        System.out.println(countSleepTime);
         game.batch.end();
 
-
     }
+
     /*
     Impostiamo i metodi booleani per sapere se l'utente sta toccando la parte sinistra o destra dello schermo
     dato che su smartphone non è possibile la gestione tramite la tastiera.
