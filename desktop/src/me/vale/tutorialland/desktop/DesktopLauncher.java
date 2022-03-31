@@ -11,6 +11,7 @@ public class DesktopLauncher {
 		config.width = SpaceGame.WIDTH;
 		config.height = SpaceGame.HEIGHT;
 		config.resizable = true;
+		config.vSyncEnabled = true;
 
 		//config.fullscreen = true;
 		new LwjglApplication(new SpaceGame(), config);

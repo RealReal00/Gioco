@@ -708,7 +708,6 @@ public class  MainGameScreen implements Screen {
             game.batch.setColor(Color.WHITE);
         }
 
-        System.out.println(countSleepTime);
         game.batch.end();
 
     }
