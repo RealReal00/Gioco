@@ -631,7 +631,7 @@ public class  MainGameScreen implements Screen {
             playerShield.render(game.batch);
         }
 
-
+        //color and soundFx of SpaceShip life
         if(health > 0.6f){
             game.batch.setColor(Color.GREEN);
         }
