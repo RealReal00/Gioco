@@ -1,6 +1,5 @@
 package me.vale.tutorialland.entities;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import me.vale.tutorialland.spacegame.SpaceGame;
@@ -11,7 +10,6 @@ public class Bullet {
     public static final int WIDTH = 3; //larghezza ed altezza sono presi dalle dimensioni dell'immagine.
     public static final int HEIGHT = 12;
     private Texture texture;
-    public static AssetManager manager;
 
     float x, y;
     CollisionReact react;
