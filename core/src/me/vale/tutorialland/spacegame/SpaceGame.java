@@ -9,8 +9,8 @@ import me.vale.tutorialland.tools.GameCamera;
 import me.vale.tutorialland.tools.ScrollingBackground;
 
 /*
-	Estendiamo SpaceGame con Game, dato che LibGdx ha una classe Game che ha molti tools per gestire menu ed altro,
-	che risultano molto utili. (ApplicationAdapter fa riferimento ad un app generica).
+	Estendiamo SpaceGame con Game, dato che LibGdx ha una classe Game che ha molti tools per gestire menu e altro,
+	che risultano molto utili. (ApplicationAdapter fa riferimento a un app generica).
  */
 
 /*
@@ -55,7 +55,7 @@ public class SpaceGame extends Game {
 	}
 
 /*
-	il metodo render viene eseguito n volte al secondo, in base alla quantità di frame per secondo (n = fps).
+	Il metodo render viene eseguito n volte al secondo, in base alla quantità di frame per secondo (n = fps).
 	Di default LibGDX è cappato a 60 fps.
 
 	ScreenUtils.clear serve per pulire lo schermo e metterlo allo stesso colore.
@@ -86,7 +86,7 @@ public class SpaceGame extends Game {
 		/* stiamo dicendo al batch che questa è la nostra camera e con .combined passiamo le matrici del nostro schermo
 		 e questo è come vogliamo che venga gestito, ovvero stretciato in base alla dimensione dello schermo. manteniamo il rapporto. */
 		batch.setProjectionMatrix(cam.combined());
-		super.render(); //utilizziamo super. perchè ci stiamo riferendo ad un metodo della classe genitore
+		super.render(); //utilizziamo super. perché ci stiamo riferendo ad un metodo della classe genitore
 	}
 
 	public void resize(int width, int height) {

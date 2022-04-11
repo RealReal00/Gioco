@@ -4,20 +4,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import me.vale.tutorialland.tools.CollisionReact;
 
-import java.util.Random;
+
+/* Questa classe fa riferimento allo scudo che viene generato sopra la navicella
+ */
 
 public class PlayerShield {
-    Random random = new Random();
-    public static final int max = 300;
-    public static final int min = 250;
-    public final int SPEED = random.nextInt(max - min) + min;
     public static final int WIDTH = 30;
     public static final int HEIGHT = 30;
     private Texture texture;
 
     float x, y;
     CollisionReact react;
-    public boolean remove = false;
 
     public PlayerShield(float x, float y){
         this.x = x;
@@ -32,10 +29,6 @@ public class PlayerShield {
 
     public void render(SpriteBatch batch) {
         batch.draw(texture, x, y);
-    }
-
-    public CollisionReact getCollisionReact() {
-        return react;
     }
 
     public float getX() {

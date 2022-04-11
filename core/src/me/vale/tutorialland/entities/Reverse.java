@@ -7,6 +7,8 @@ import me.vale.tutorialland.tools.CollisionReact;
 
 import java.util.Random;
 
+// Questa classe rappresenta l'entità reverse che inverte i comandi sinistra e destra.
+
 public class Reverse {
 
     Random random = new Random();

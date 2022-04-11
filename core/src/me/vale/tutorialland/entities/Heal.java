@@ -7,6 +7,8 @@ import me.vale.tutorialland.tools.CollisionReact;
 
 import java.util.Random;
 
+// Questa classe rappresenta l'entità heal che ripristina 20% degli HP.
+
 public class Heal {
 
     Random random = new Random();

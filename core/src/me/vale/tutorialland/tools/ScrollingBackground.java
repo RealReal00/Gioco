@@ -5,6 +5,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import me.vale.tutorialland.screen.MainGameScreen;
 import me.vale.tutorialland.spacegame.SpaceGame;
 
+/* La classe ScrollingBackground ci serve per dare l'illusione che lo sfondo sia continuo, quando in realtà prendiamo la stessa
+immagine due volte, e facciamo scorrere la prima e prima che finisca facciamo scorrere la seconda, in modo da dare senso di continuità
+*/
+
 public class ScrollingBackground {
 
     public static final int DEFAULT_SPEED = 80;

@@ -7,14 +7,14 @@ import me.vale.tutorialland.tools.CollisionReact;
 
 public class Bullet {
     public static final int SPEED = 500;
-    public static final int WIDTH = 3; //larghezza ed altezza sono presi dalle dimensioni dell'immagine.
+    public static final int WIDTH = 3; //larghezza e altezza sono presi dalle dimensioni dell'immagine.
     public static final int HEIGHT = 12;
     private Texture texture;
 
     float x, y;
     CollisionReact react;
 
-    //l'oggetto è pubblico perchè possiamo rimuoverlo dalla lista che esternamente.
+    //l'oggetto è pubblico perché possiamo rimuoverlo dalla lista che esternamente.
     public boolean remove = false;
 
     public Bullet(float x, float y) {

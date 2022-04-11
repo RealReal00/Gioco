@@ -6,15 +6,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /*
-questa classe tiene conto di ogni singola esplosione sulla mappa, e quando l'animazione dell'esplosione è finita
+Questa classe tiene conto di ogni singola esplosione sulla mappa, e quando l'animazione dell'esplosione è finita
 viene rimossa.
  */
 public class Explosion {
     public static final float FRAME_LENGHT = 0.2f;  //tempo tra ogni frame dell'animazione
-    public static int OFFSET = 8; //dobbiamo sottratte 8 alla posizone dell'asteroide per fare in modo che l'esplosione sia centrata
+    public static int OFFSET = 8; //dobbiamo sottratte 8 alla posizione dell'asteroide per fare in modo che l'esplosione sia centrata
     public static int SIZE = 32; //dimensione dell'esplosione
 
-    private static Animation anim = null;
+    private static Animation<TextureRegion> anim;
     float x, y;
     float statetime;
 
@@ -31,7 +31,7 @@ public class Explosion {
     }
 
     /*
-    quando il tempo inizia (statetime = 0), il codice per l'animazione progedisce in base al progedire del tempo.
+    quando il tempo inizia (statetime = 0), il codice per l'animazione progredisce in base al progredire del tempo.
 
      */
 
@@ -43,6 +43,6 @@ public class Explosion {
     }
 
     public void render(SpriteBatch batch) {
-        batch.draw((TextureRegion) anim.getKeyFrame(statetime),x,y);
+        batch.draw( anim.getKeyFrame(statetime),x,y);
     }
 }

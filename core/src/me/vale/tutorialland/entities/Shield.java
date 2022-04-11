@@ -2,10 +2,11 @@ package me.vale.tutorialland.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.tools.CollisionReact;
 
 import java.util.Random;
+
+// Questa classe rappresenta l'entità shield che attiva lo scudo (PlayerShield) che viene disegnato sopra la navicella.
 
 public class Shield {
 
