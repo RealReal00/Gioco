@@ -56,7 +56,7 @@ public class SpaceGame extends Game {
 
 /*
 	Il metodo render viene eseguito n volte al secondo, in base alla quantità di frame per secondo (n = fps).
-	Di default LibGDX è cappato a 60 fps.
+	Di default LibGDX è cappato (soglia) a 60 fps.
 
 	ScreenUtils.clear serve per pulire lo schermo e metterlo allo stesso colore.
 

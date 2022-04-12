@@ -9,6 +9,14 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import me.vale.tutorialland.spacegame.SpaceGame;
 import me.vale.tutorialland.tools.ScrollingBackground;
 
+
+/* Questa classe implementa Screen ed è il MainMenu dell'app. Sono implementati i bottoni play, exit (attivi e inattivi) e i relativi suoni. Impostiamo la velocità di scorrimento
+del background, e tramite touchDown controlliamo dove avvengono le pressioni su schermo (pressioni o click).
+
+- il metodo Render si occupa della componente grafica, disegnando prima lo sfondo, poi successivamente i pulsanti (attivi e inattivi).
+
+- il metodo Dispose serve per disfarsi di tutti i componenti grafici e gli input che sono stati raccolti in questa schermata (MainMenu).
+ */
 public class MainMenuScreen implements Screen {
 
     private static final int EXIT_BUTTON_WIDTH = 100;

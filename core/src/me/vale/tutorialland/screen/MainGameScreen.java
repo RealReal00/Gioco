@@ -475,10 +475,9 @@ public class  MainGameScreen implements Screen {
             for (Asteroid asteroid : asteroids) {
                 if (asteroid.getCollisionReact().collidesWith(playerReact)) {
                     asteroidsToRemove.add(asteroid);
-                    if (!shieldBonus) {
                         health -= 0.1;
                         hitFx.play();
-                    }
+
 
                     //if health is depleted go to game over screen
                     if (health <= 0) {

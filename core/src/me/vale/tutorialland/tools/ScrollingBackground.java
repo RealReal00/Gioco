@@ -11,7 +11,7 @@ immagine due volte, e facciamo scorrere la prima e prima che finisca facciamo sc
 
 public class ScrollingBackground {
 
-    public static final int DEFAULT_SPEED = 80;
+    public static final int DEFAULT_SPEED = 150;
     public static final int ACCELERATION = 50;
     public static final int GOAL_REACH_ACCELLERATION = 200;
 
