@@ -25,12 +25,12 @@ public class  MainGameScreen implements Screen {
 
     public static final float SPEED = 400;
     public static final float SHIP_ANIMATION_SPEED = 0.5f;
-    public static final int SHIP_WIDTH_PIXEL = 17;
-    public static final int SHIP_HEIGHT_PIXEL = 32;
+    public static int SHIP_WIDTH_PIXEL = 17;
+    public static int SHIP_HEIGHT_PIXEL = 32;
 
     //sono le misure dell'immagine che andremo a disegnare
-    public static final int SHIP_WIDTH = SHIP_WIDTH_PIXEL * 3;
-    public static final int SHIP_HEIGHT = SHIP_HEIGHT_PIXEL * 3;
+    public static int SHIP_WIDTH = SHIP_WIDTH_PIXEL * 3;
+    public static int SHIP_HEIGHT = SHIP_HEIGHT_PIXEL * 3;
 
     //BULLETS
     public static final float ROLL_TIMER_SWITCH_TIME = 0.25f; //tempo che si impiega tra un roll e l'altro dell'animazione
@@ -48,14 +48,20 @@ public class  MainGameScreen implements Screen {
     public static final float MIN_REVERSE_SPAWN_TIME = 7f; //minimo di tempo di spawn tra un reverse e l'altro
     public static final float MAX_REVERSE_SPAWN_TIME = 12f; //max tempo di spawn di un reverse
     public static final float REVERSE_WAIT_TIME = 15;
+    public static final float MEGAFUNGUS_WAIT_TIME = 5;
+
 
     //Shield
     public static final float MIN_SHIELD_SPAWN_TIME = 15f; //minimo di tempo di spawn tra uno shield e l'altro
     public static final float MAX_SHIELD_SPAWN_TIME = 20.5f; //max tempo di spawn di un shield
+    public static final float MIN_MEGAFUNGUS_SPAWN_TIME=10f;
+    public static final float MAX_MEGAFUNGUS_SPAWN_TIME=15f;
+
     public static final float SHIELD_WAIT_TIME = 6.5f;
 
     public static final int PLAYERSHIELD_WIDTH = 150;
     public static final int PLAYERSHIELD_HEIGHT = 150;
+
 
     public static final float WAIT_COMMAND = 2;
 
@@ -65,6 +71,8 @@ public class  MainGameScreen implements Screen {
     private final Music music = Gdx.audio.newMusic(Gdx.files.internal("8 Bit Universe.mp3"));
     private final Sound shoot = Gdx.audio.newSound(Gdx.files.internal("shootSound.mp3"));
     private final Sound healFx = Gdx.audio.newSound(Gdx.files.internal("restoreHP.mp3"));
+    private final Sound megaMushroom = Gdx.audio.newSound(Gdx.files.internal("megaMushroom.mp3"));
+
     private final Sound explosionFx = Gdx.audio.newSound(Gdx.files.internal("Explosion Sound Effect.mp3"));
     private final Sound hitFx = Gdx.audio.newSound(Gdx.files.internal("8-Bit Hit Sound Effect.mp3"));
     private final Sound lowHp = Gdx.audio.newSound(Gdx.files.internal("lowHp.mp3"));
@@ -73,6 +81,7 @@ public class  MainGameScreen implements Screen {
     private float waitCommandCounter = 0;
     private float waitReverseCounter = 0;
     private float waitShieldCounter = 0;
+    private float waitMegafungusCounter=0;
 
     float x;
     float y;
@@ -84,12 +93,16 @@ public class  MainGameScreen implements Screen {
     float healsSpawnTimer;
     float reverseSpawnTimer;
     float shieldSpawnTimer;
+    float megafungusSpawnTimer;
 
+
+    float countSleepTime;
     Random random;
 
     public boolean reverseMalus = false;
     public boolean shieldBonus = false;
     public boolean onceLowHp = false;
+    public boolean megafungusBonus = false;
 
     float shootTimer;
     SpaceGame game;
@@ -99,9 +112,11 @@ public class  MainGameScreen implements Screen {
     ArrayList<Heal> heals;
     ArrayList<Reverse> reverses;
     ArrayList<Shield> shields;
+    ArrayList<Megafungus> megafungus;
 
     Texture blank;
     Texture controls;
+    Texture pauseButton;
 
     BitmapFont scoreFont;
 
@@ -130,11 +145,19 @@ public class  MainGameScreen implements Screen {
         reverses = new ArrayList<>();
         heals = new ArrayList<>();
         shields = new ArrayList<>();
+        megafungus = new ArrayList<>();
         scoreFont = new BitmapFont(Gdx.files.internal("fonts/score.fnt"));
         playerReact = new CollisionReact(0,0,SHIP_WIDTH,SHIP_HEIGHT);
         shieldReact = new CollisionReact(0,0,PLAYERSHIELD_WIDTH, PLAYERSHIELD_HEIGHT);
         blank = new Texture("blank.png");
 
+
+
+
+        //BUTTON
+
+
+        
         //MUSIC & SOUNDFX
 
         if(SpaceGame.IS_MOBILE){
@@ -152,6 +175,7 @@ public class  MainGameScreen implements Screen {
         healsSpawnTimer = random.nextFloat() * (MAX_HEAL_SPAWN_TIME - MIN_HEAL_SPAWN_TIME) + MIN_HEAL_SPAWN_TIME;
         reverseSpawnTimer = random.nextFloat() * (MAX_REVERSE_SPAWN_TIME - MIN_REVERSE_SPAWN_TIME) + MIN_REVERSE_SPAWN_TIME;
         shieldSpawnTimer = random.nextFloat() * (MAX_SHIELD_SPAWN_TIME - MIN_SHIELD_SPAWN_TIME) + MIN_SHIELD_SPAWN_TIME;
+        megafungusSpawnTimer = random.nextFloat() * (MAX_MEGAFUNGUS_SPAWN_TIME - MIN_MEGAFUNGUS_SPAWN_TIME) + MIN_MEGAFUNGUS_SPAWN_TIME;
 
         shootTimer = 0;
 
@@ -192,6 +216,15 @@ public class  MainGameScreen implements Screen {
         music.setVolume(0.1f);
         music.play();
 
+
+        countSleepTime += Gdx.graphics.getDeltaTime();
+        System.out.println(countSleepTime);
+
+        float touchX = game.cam.getInputInGameWorld().x, touchY = SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y;
+
+
+
+
         //shooting code
         shootTimer += delta;
         if ((isLeft() || isRight()) && shootTimer >= SHOOT_WAIT_TIME && SpaceGame.IS_MOBILE) {
@@ -226,7 +259,9 @@ public class  MainGameScreen implements Screen {
         if (shootTimer >= SHOOT_WAIT_TIME && !SpaceGame.IS_MOBILE && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             shootTimer = 0;
 
-            int offset = 4;
+            int offset = 4;  // in condizioni normali della navicella facciamo x + 4 per posizionare il proiettile
+            // nel punto giusto. Il + 4 perchè in verità l'immagine inizia da prima e quindi dobbiamo spostare lo
+            // sparo un pò più avanti anche se sembra quello l'inizio.
 
             if (roll == 1 || roll == 3) { //virata leggera (sia sinistra che destra)
                 offset = 8;
@@ -259,7 +294,22 @@ public class  MainGameScreen implements Screen {
             asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
             asteroids.add(new Asteroid(random.nextInt(SpaceGame.WIDTH - Asteroid.WIDTH)));
         }
+        //Megafungus Spawn Code
+        megafungusSpawnTimer-=delta;
+        if(megafungusSpawnTimer<=0){
+            megafungusSpawnTimer=random.nextFloat() * (MAX_MEGAFUNGUS_SPAWN_TIME - MIN_MEGAFUNGUS_SPAWN_TIME) + MIN_MEGAFUNGUS_SPAWN_TIME;
+            megafungus.add(new Megafungus(random.nextInt(Gdx.graphics.getWidth()-Megafungus.WIDTH)));
+        }
 
+        //Update megafungus
+        ArrayList<Megafungus> megafungusToRemove = new ArrayList<>();
+        for (Megafungus megafunghi : megafungus) {
+            megafunghi.update(delta);
+            if (megafunghi.remove) {
+                megafungusToRemove.add(megafunghi);
+            }
+        }
+        megafungus.removeAll(megafungusToRemove);
         //heal spawn code
         healsSpawnTimer -= delta;
         if (healsSpawnTimer <= 0) {
@@ -459,6 +509,10 @@ public class  MainGameScreen implements Screen {
         for (Bullet bullet : bullets) {
             for (Asteroid asteroid : asteroids) {
                 if (bullet.getCollisionReact().collidesWith(asteroid.getCollisionReact())) { //avviene una collisione
+                    //con bullet.getCollisionReact io sto andando a prendere le coordinate del bullet e le due
+                    // dimensioni dell'immagine del bullet ( basta che guardi il costruttore di CollisionReact ),
+                    // idem con l'asteroide... quel che ne esce è il confornto tra i due per vedere se collidono
+                    // usando il metodo collideWith
                     bulletsToRemove.add(bullet);
                     asteroidsToRemove.add(asteroid);
                     explosions.add(new Explosion(asteroid.getX(), asteroid.getY()));
@@ -475,9 +529,10 @@ public class  MainGameScreen implements Screen {
             for (Asteroid asteroid : asteroids) {
                 if (asteroid.getCollisionReact().collidesWith(playerReact)) {
                     asteroidsToRemove.add(asteroid);
+                    if (!shieldBonus) {
                         health -= 0.1;
                         hitFx.play();
-
+                    }
 
                     //if health is depleted go to game over screen
                     if (health <= 0) {
@@ -526,8 +581,11 @@ public class  MainGameScreen implements Screen {
             for (Shield shield : shields) {
                 if (shield.getCollisionReact().collidesWith(playerReact)) {
                     shieldsToRemove.add(shield);
-                    shieldBonus = true;
+                    if(!megafungusBonus) {
+                        shieldBonus = true;
+                    }
                     waitShieldCounter = 0;
+
                 }
             }
             shields.removeAll(shieldsToRemove);
@@ -583,7 +641,46 @@ public class  MainGameScreen implements Screen {
             }
             heals.removeAll(healsToRemove);
         }
+        for (Megafungus funghi : megafungus) {
+            if (funghi.getCollisionReact().collidesWith(playerReact)) {   //avviene una collisione
+                megafungusToRemove.add(funghi);
+                megafungusBonus=true;
+                if(megafungusBonus && SHIP_WIDTH==51 && SHIP_HEIGHT==96 && !shieldBonus) {
+                    SHIP_HEIGHT = SHIP_HEIGHT + 50;
+                    SHIP_WIDTH = SHIP_WIDTH + 50;
+                    Bullet.HEIGHT=Bullet.HEIGHT + 40;
+                    Bullet.WIDTH=Bullet.WIDTH + 20;
+                }
+                waitMegafungusCounter=0;
+                long idfungus = megaMushroom.play();
+                megaMushroom.setVolume(idfungus, 1f);
+            }
 
+        }
+        megafungus.removeAll(megafungusToRemove);
+        waitMegafungusCounter += Gdx.graphics.getDeltaTime();
+        if (waitMegafungusCounter >= MEGAFUNGUS_WAIT_TIME) {
+            waitMegafungusCounter = 0;
+
+            megafungusBonus = false;
+
+        }
+
+         if(!megafungusBonus && SHIP_WIDTH!=51 && SHIP_HEIGHT!=96 ){
+            SHIP_WIDTH=SHIP_WIDTH - 50;
+            SHIP_HEIGHT= SHIP_HEIGHT - 50;
+             Bullet.HEIGHT=Bullet.HEIGHT - 40;
+             Bullet.WIDTH=Bullet.WIDTH - 20;
+        }
+
+        for (Megafungus funghi : megafungus) {
+            if (funghi.getCollisionReact().collidesWith(shieldReact)) { //avviene una collisione
+                megafungusToRemove.add(funghi);
+               // shieldBonus=false;
+
+            }
+        }
+        megafungus.removeAll(reversesToRemove);
 
         stateTime += delta;
 
@@ -595,10 +692,10 @@ public class  MainGameScreen implements Screen {
 
         game.ScrollingBackground.updateAndRender(delta, game.batch);
 
-       // game.batch.draw(pauseButton,pauseButtonX,Gdx.graphics.getHeight()-PAUSEBUTTON_HEIGHT);
 
-        for (Bullet bullet : bullets) {
-            bullet.render(game.batch);
+
+        for (Bullet bullet : bullets) {  //serve per rendere i proiettili visibili al giocatore
+           bullet.render(game.batch);
         }
 
         for (Asteroid asteroid : asteroids) {
@@ -624,6 +721,14 @@ public class  MainGameScreen implements Screen {
         for (Shield shield : shields) {
             shield.render(game.batch);
         }
+
+        for(Megafungus megafunghi : megafungus){
+            megafunghi.render(game.batch);
+        }
+
+
+
+        System.out.println(game.cam.getInputInGameWorld().y);
 
 
         if (shieldBonus) {
@@ -665,6 +770,7 @@ public class  MainGameScreen implements Screen {
             game.batch.setColor(Color.WHITE);
         }
 
+        System.out.println(countSleepTime);
         game.batch.end();
 
     }
@@ -755,5 +861,6 @@ public class  MainGameScreen implements Screen {
     explosionFx.dispose();
     hitFx.dispose();
     lowHp.dispose();
+    megaMushroom.dispose();
     }
 }

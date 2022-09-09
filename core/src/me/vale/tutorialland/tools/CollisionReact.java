@@ -21,7 +21,8 @@ public class CollisionReact {
         this.height = height;
     }
 
-    public void move (float x, float y){
+    public void move (float x, float y){   // il metodo move serve perchè la collisione
+                                            //non avviene sempre nello stesso punto
         this.x = x;
         this.y = y;
     }
