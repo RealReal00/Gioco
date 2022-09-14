@@ -12,9 +12,9 @@ import java.util.Random;
 
 
 public class Megafungus {
-    public static final int SPEED= 700;
-    public static final int WIDTH= 80;
-    public static final int HEIGHT= 80;
+    public static final int SPEED= 400;
+    public static final int WIDTH= 30;
+    public static final int HEIGHT= 30;
 
     private static Texture texture;
     float x,y;
