@@ -819,6 +819,39 @@ public class  MainGameScreen implements Screen {
 
         //rimuoviamo qualsiasi cosa collida sul playerShield
         if (shieldBonus) {
+            if(health_ufo>0) {
+                if (score > 300) {
+                    for (Bullet bullet : bullets) {
+                        if (bullet.getCollisionReact().collidesWith(ufoReact)) {
+                            bulletsToRemove.add(bullet);
+                            health_ufo -= 0.3;
+                            //hitFx.play();
+                            //if health is depleted go to game over screen
+                            if (health_ufo <= 0) {
+                                explosionUfos.add(new ExplosionUfo(k, j));
+                            }
+                        }
+                    }
+                    bullets.removeAll(bulletsToRemove);
+                    //collisione fireball e ship
+                    for (Fireball fireball : fireballs) {
+                        if (fireball.getCollisionReact().collidesWith(playerReact)) {
+                            fireballsToRemove.add(fireball);
+                            if (!shieldBonus) {
+                                health -= 0.4;
+                                //hitFx.play();
+                            }
+                            //if health is depleted go to game over screen
+                            if (health <= 0) {
+                                this.dispose(); //causes the JFrame window to be destroyed and cleaned up by the operating system
+                                game.setScreen(new GameOverScreen(game, score));
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            fireballs.removeAll(fireballsToRemove);
             for (Asteroid asteroid : asteroids) {
                 if (asteroid.getCollisionReact().collidesWith(shieldReact)) { //avviene una collisione
                     asteroidsToRemove.add(asteroid);
@@ -1025,7 +1058,7 @@ public class  MainGameScreen implements Screen {
                if (!no_ufo) {
                    no_ufo = true;
                    long sconfitta_ufo = ufo_lost.play();
-                   ufo_lost.setVolume(sconfitta_ufo, 0.6f);
+                   ufo_lost.setVolume(sconfitta_ufo, 1f);
                }
            }
        }
