@@ -73,6 +73,9 @@ public class  MainGameScreen implements Screen {
 
     public static final int PLAYERSHIELD_WIDTH = 150;
     public static final int PLAYERSHIELD_HEIGHT = 150;
+    public static long cnt_ufo=0;
+    public static long cnt_ufo1=0;
+
 
 
     public static final float WAIT_COMMAND = 2;
@@ -289,6 +292,7 @@ public class  MainGameScreen implements Screen {
         float touchX = game.cam.getInputInGameWorld().x, touchY = SpaceGame.HEIGHT - game.cam.getInputInGameWorld().y;
         //shooting code
         shootTimer += delta;
+
         if ((isLeft() || isRight()) && shootTimer >= SHOOT_WAIT_TIME && SpaceGame.IS_MOBILE) {
             shootTimer = 0;
             int offset = 4;
@@ -362,7 +366,8 @@ public class  MainGameScreen implements Screen {
         if(fireballsSpawnTimer<=0){
             fireballsSpawnTimer = random.nextFloat() * (MAX_FIREBALL_SPAWN_TIME - MIN_FIREBALL_SPAWN_TIME) + MIN_FIREBALL_SPAWN_TIME;
             fireballs.add(new Fireball(k + (float) UFO_WIDTH / 2, j));
-            if(health_ufo>0 && score>300) {
+            //score>300
+            if(health_ufo>0 && score>=100) {
                long sound_fireball = fireball_sound.play();
                fireball_sound.setVolume(sound_fireball,1f);
             }
@@ -423,7 +428,8 @@ public class  MainGameScreen implements Screen {
             ArrayList<Fireball> fireballsToRemove = new ArrayList<>();
 
         if(health_ufo>0) {
-            if (score > 300) {
+            //score>300
+            if (score >= 100) {
                 for (Fireball fireball : fireballs) {
                     fireball.update(delta);
                     //fireball_sound.play();
@@ -532,7 +538,8 @@ public class  MainGameScreen implements Screen {
         }
         //movimento  ufo
         if(health_ufo>0) {
-            if (score > 300) {
+            //score>300
+            if (score >= 100) {
                 if (val == 0) {
                     movement_ufo_estremi = false;
                     val++;
@@ -705,11 +712,12 @@ public class  MainGameScreen implements Screen {
 
             //Collisione bullet e ufo
         if(health_ufo>0) {
-            if (score > 300) {
+            //score>300
+            if (score > 100) {
                 for (Bullet bullet : bullets) {
                     if (bullet.getCollisionReact().collidesWith(ufoReact)) {
                         bulletsToRemove.add(bullet);
-                        health_ufo -= 0.3;
+                        health_ufo -= 0.05;
                         //hitFx.play();
                         //if health is depleted go to game over screen
                         if (health_ufo <= 0) {
@@ -820,11 +828,12 @@ public class  MainGameScreen implements Screen {
         //rimuoviamo qualsiasi cosa collida sul playerShield
         if (shieldBonus) {
             if(health_ufo>0) {
-                if (score > 300) {
+                //300
+                if (score > 100) {
                     for (Bullet bullet : bullets) {
                         if (bullet.getCollisionReact().collidesWith(ufoReact)) {
                             bulletsToRemove.add(bullet);
-                            health_ufo -= 0.3;
+                            health_ufo -= 0.05;
                             //hitFx.play();
                             //if health is depleted go to game over screen
                             if (health_ufo <= 0) {
@@ -958,7 +967,8 @@ public class  MainGameScreen implements Screen {
             asteroid.render(game.batch);
         }
         if(health_ufo>0) {
-            if(score>300) {
+            //score>300
+            if(score>= 100) {
                 for (Fireball fireball : fireballs) {
                    // fireball_sound.play();
                     fireball.render(game.batch);
@@ -1024,19 +1034,19 @@ public class  MainGameScreen implements Screen {
 
         game.batch.draw((TextureRegion) rolls[roll].getKeyFrame(stateTime, true), x, y, SHIP_WIDTH, SHIP_HEIGHT);
        // game.batch.draw((TextureRegion) rolls[roll_ufo].getKeyFrame(stateTime, true), k, j, UFO_WIDTH, UFO_HEIGHT);
-       if(score>300) {
+       if(score>=100) {
            if (health_ufo > 0) {
                game.batch.draw(navicella_ufo, k, j, UFO_WIDTH, UFO_HEIGHT / 2);
-               if(health_ufo>0.6){
+               if(health_ufo>0.6f){
                    game.batch.draw(verde, 0, SpaceGame.HEIGHT-5, SpaceGame.WIDTH * health_ufo, 5);
                }
                else if(health_ufo>0.2f && health_ufo<=0.6f){
-                   verde.dispose();
+                   //verde.dispose();
                    game.batch.draw(giallo, 0, SpaceGame.HEIGHT-5, SpaceGame.WIDTH * health_ufo, 5);
 
                }
                else if(health_ufo>0 && health_ufo<=0.2f) {
-                   giallo.dispose();
+                   //giallo.dispose();
                    game.batch.draw(rosso, 0, SpaceGame.HEIGHT - 5, SpaceGame.WIDTH * health_ufo, 5);
                }
               /* else if(health_ufo==0){
@@ -1048,11 +1058,10 @@ public class  MainGameScreen implements Screen {
                    long risata_sound = risata.play();
                    risata.setVolume(risata_sound, 0.5f);
                }
-
-
+               cnt_ufo1=score;
            }
            if(health_ufo==0) {
-               rosso.dispose();
+           //    rosso.dispose();
            }
            if(health_ufo<=0) {
                if (!no_ufo) {
@@ -1061,6 +1070,14 @@ public class  MainGameScreen implements Screen {
                    ufo_lost.setVolume(sconfitta_ufo, 1f);
                }
            }
+          // cnt_ufo=score;
+
+       }
+       if(score-cnt_ufo1>1000 && health_ufo<=0 && score!=0){
+          // cnt_ufo=0;11
+           health_ufo=1;
+           risata_ufo=false;
+           no_ufo=false;
        }
 
 
