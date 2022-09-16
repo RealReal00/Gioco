@@ -29,6 +29,7 @@ public class  MainGameScreen implements Screen {
     public static final float SHIP_ANIMATION_SPEED = 0.5f;
     public static final float UFO_ANIMATION_SPEED = 0.5f;
 
+
     public static int SHIP_WIDTH_PIXEL = 17;
     public static int SHIP_HEIGHT_PIXEL = 32;
 
@@ -37,6 +38,10 @@ public class  MainGameScreen implements Screen {
     public static int SHIP_HEIGHT = SHIP_HEIGHT_PIXEL * 3;
     public static int UFO_WIDTH=51;
     public static int UFO_HEIGHT=96;
+    public static int SKULL_HEIGHT=70;
+    public static int SKULL_WIDTH=55;
+    public boolean sx=true;
+   // public boolean dx=false;
 
 
     //BULLETS
@@ -68,6 +73,11 @@ public class  MainGameScreen implements Screen {
     public static final float MAX_SHIELD_SPAWN_TIME = 20.5f; //max tempo di spawn di un shield
     public static final float MIN_MEGAFUNGUS_SPAWN_TIME=10f;
     public static final float MAX_MEGAFUNGUS_SPAWN_TIME=15f;
+    public static final float MIN_SKULLS_SPAWN_TIME=1f;
+    public static final float MAX_SKULLS_SPAWN_TIME=3f;
+
+
+
 
     public static final float SHIELD_WAIT_TIME = 6.5f;
 
@@ -117,6 +127,7 @@ public class  MainGameScreen implements Screen {
     float stateTime; //usiamo come stato generale per l'animazione.
                     // La classe animazione
     float asteroidsSpawnTimer;
+    float skullsSpawnTimer;
     float fireballsSpawnTimer;
     float healsSpawnTimer;
     float reverseSpawnTimer;
@@ -145,6 +156,7 @@ public class  MainGameScreen implements Screen {
     ArrayList<Bullet> bullets;
     ArrayList<Fireball> fireballs;
     ArrayList<Asteroid> asteroids;
+    ArrayList<Teschio> skulls;
     ArrayList<Explosion> explosions;
     ArrayList<ExplosionUfo> explosionUfos;
     ArrayList<Heal> heals;
@@ -190,6 +202,8 @@ public class  MainGameScreen implements Screen {
         fireballs = new ArrayList<>();
         bullets = new ArrayList<>();
         asteroids = new ArrayList<>();
+        skulls = new ArrayList<>();
+
         explosions = new ArrayList<>();
         explosionUfos = new ArrayList<>();
         reverses = new ArrayList<>();
@@ -229,6 +243,7 @@ public class  MainGameScreen implements Screen {
         random = new Random();
         fireballsSpawnTimer = random.nextFloat() * (MAX_FIREBALL_SPAWN_TIME - MIN_FIREBALL_SPAWN_TIME) + MIN_FIREBALL_SPAWN_TIME;
         asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
+        skullsSpawnTimer = random.nextFloat() * (MAX_SKULLS_SPAWN_TIME - MIN_SKULLS_SPAWN_TIME) + MIN_SKULLS_SPAWN_TIME;
         healsSpawnTimer = random.nextFloat() * (MAX_HEAL_SPAWN_TIME - MIN_HEAL_SPAWN_TIME) + MIN_HEAL_SPAWN_TIME;
         reverseSpawnTimer = random.nextFloat() * (MAX_REVERSE_SPAWN_TIME - MIN_REVERSE_SPAWN_TIME) + MIN_REVERSE_SPAWN_TIME;
         shieldSpawnTimer = random.nextFloat() * (MAX_SHIELD_SPAWN_TIME - MIN_SHIELD_SPAWN_TIME) + MIN_SHIELD_SPAWN_TIME;
@@ -361,6 +376,12 @@ public class  MainGameScreen implements Screen {
             asteroidsSpawnTimer = random.nextFloat() * (MAX_ASTEROID_SPAWN_TIME - MIN_ASTEROID_SPAWN_TIME) + MIN_ASTEROID_SPAWN_TIME;
             asteroids.add(new Asteroid(random.nextInt(SpaceGame.WIDTH - Asteroid.WIDTH)));
         }
+        //Skulls Spawn Code
+        skullsSpawnTimer -= delta;
+        if (skullsSpawnTimer <= 0) {
+            skullsSpawnTimer = random.nextFloat() * (MAX_SKULLS_SPAWN_TIME - MIN_SKULLS_SPAWN_TIME) + MIN_SKULLS_SPAWN_TIME;
+            skulls.add(new Teschio(random.nextInt(SpaceGame.WIDTH - SKULL_WIDTH)));
+        }
         //Fireballs Spawn Code
         fireballsSpawnTimer-=delta;
         if(fireballsSpawnTimer<=0){
@@ -413,6 +434,21 @@ public class  MainGameScreen implements Screen {
             asteroid.update(delta);
             if (asteroid.remove) {
                 asteroidsToRemove.add(asteroid);
+            }
+        }
+        //Update skulls
+        ArrayList<Teschio> skullsToRemove = new ArrayList<>();
+        for (Teschio skull : skulls) {
+            if(sx) {
+                sx=false;
+                skull.update(delta);
+            }
+            else if(!sx) {
+                sx=true;
+                skull.update1(delta);
+            }
+            if (skull.remove) {
+                skullsToRemove.add(skull);
             }
         }
         //update bullets (loop dentro la lista bullets, per ogni bullet presente al suo interno).
@@ -766,6 +802,25 @@ public class  MainGameScreen implements Screen {
             asteroids.removeAll(asteroidsToRemove);
 
 
+            //collisione teschio con ship
+            for (Teschio skull : skulls) {
+                if (skull.getCollisionReact().collidesWith(playerReact)) {
+                    skullsToRemove.add(skull);
+                    if (!shieldBonus) {
+                        health -= 0.8f;
+                        //hitFx.play();
+                    }
+
+                    //if health is depleted go to game over screen
+                    if (health <= 0) {
+                        this.dispose(); //causes the JFrame window to be destroyed and cleaned up by the operating system
+                        game.setScreen(new GameOverScreen(game, score));
+                        return;
+                    }
+                }
+            }
+            skulls.removeAll(skullsToRemove);
+
             for (Heal heal : heals) {
                 if (heal.getCollisionReact().collidesWith(playerReact)) {
                     healsToRemove.add(heal);
@@ -862,15 +917,33 @@ public class  MainGameScreen implements Screen {
             }
             fireballs.removeAll(fireballsToRemove);
             for (Asteroid asteroid : asteroids) {
-                if (asteroid.getCollisionReact().collidesWith(shieldReact)) { //avviene una collisione
+                if (asteroid.getCollisionReact().collidesWith(shieldReact)) {
                     asteroidsToRemove.add(asteroid);
                     explosions.add(new Explosion(asteroid.getX(), asteroid.getY()));
-                    score += 25;
-                    long idExplosion = explosionFx.play();
-                    explosionFx.setVolume(idExplosion, 0.3f);
+                     long idExplosion = explosionFx.play();
+                     explosionFx.setVolume(idExplosion, 0.3f);
+                    if (!shieldBonus) {
+                        health -= 0.4;
+                        //hitFx.play();
+                    }
+                    //if health is depleted go to game over screen
+                    if (health <= 0) {
+                        this.dispose(); //causes the JFrame window to be destroyed and cleaned up by the operating system
+                        game.setScreen(new GameOverScreen(game, score));
+                        return;
+                    }
                 }
             }
             asteroids.removeAll(asteroidsToRemove);
+
+            for (Teschio skull : skulls) {
+                if (skull.getCollisionReact().collidesWith(shieldReact)) { //avviene una collisione
+                    skullsToRemove.add(skull);
+                    score += 50;
+
+                }
+            }
+            skulls.removeAll(skullsToRemove);
 
 
             for (Reverse reverse : reverses) {
@@ -965,6 +1038,9 @@ public class  MainGameScreen implements Screen {
 
         for (Asteroid asteroid : asteroids) {
             asteroid.render(game.batch);
+        }
+        for (Teschio skull : skulls) {
+            skull.render(game.batch);
         }
         if(health_ufo>0) {
             //score>300
